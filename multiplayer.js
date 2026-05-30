@@ -21,6 +21,7 @@ const leaveMatchBtn = document.getElementById("leaveMatchBtn");
 const loginPopup = document.getElementById("loginPopup");
 const emailInput = document.getElementById("email");
 const passwordInput = document.getElementById("password");
+const usernameInput = document.getElementById("username");
 const signupBtn = document.getElementById("signupBtn");
 const loginBtn = document.getElementById("loginBtn");
 const closeLogin = document.getElementById("closeLogin");
@@ -54,14 +55,13 @@ import {
 // FIREBASE CONFIG (PUT YOURS HERE)
 // --------------------------------------------------
 const firebaseConfig = {
-  apiKey: "AIzaSyC7J59ExJVU3j9meWZxpopAA0IqutOgX6Q",
-  authDomain: "puzzle-multiplayer-8.firebaseapp.com",
-  databaseURL: "https://puzzle-multiplayer-8-default-rtdb.asia-southeast1.firebasedatabase.app",
-  projectId: "puzzle-multiplayer-8",
-  storageBucket: "puzzle-multiplayer-8.firebasestorage.app",
-  messagingSenderId: "513197674871",
-  appId: "1:513197674871:web:9a6553631d87518e5ad172",
-  measurementId: "G-FZPL8KLPQ7"
+  apiKey: "YOUR_API_KEY",
+  authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+  databaseURL: "https://YOUR_PROJECT_ID-default-rtdb.firebaseio.com",
+  projectId: "YOUR_PROJECT_ID",
+  storageBucket: "YOUR_PROJECT_ID.appspot.com",
+  messagingSenderId: "YOUR_SENDER_ID",
+  appId: "YOUR_APP_ID"
 };
 
 const app = initializeApp(firebaseConfig);
@@ -76,7 +76,7 @@ let currentRoomCode = null;
 let isHost = false;
 
 // --------------------------------------------------
-// TAB SWITCHING (FIXED)
+// TAB SWITCHING
 // --------------------------------------------------
 function showPractice() {
   practiceTab.classList.add("active");
@@ -96,13 +96,11 @@ function showMultiplayerIfLoggedIn() {
 
 function handleMultiplayerClick() {
   if (!currentUser) {
-    // ❌ BLOCK ACCESS — DO NOT SHOW MULTIPLAYER PANEL
     showPractice();
     loginPopup.classList.remove("hidden");
     return;
   }
 
-  // ✔ Logged in → allow access
   showMultiplayerIfLoggedIn();
 }
 
@@ -119,14 +117,36 @@ closeLogin.addEventListener("click", () => {
 signupBtn.addEventListener("click", async () => {
   const email = emailInput.value.trim();
   const password = passwordInput.value.trim();
+  const username = usernameInput.value.trim();
 
-  if (!email || !password) {
-    alert("Enter email and password.");
+  if (!email || !password || !username) {
+    alert("Enter email, password, and username.");
+    return;
+  }
+
+  // Check if username already exists
+  const usernameRef = ref(db, `usernames/${username}`);
+  const usernameSnap = await get(usernameRef);
+
+  if (usernameSnap.exists()) {
+    alert("Username already in use. Choose another.");
     return;
   }
 
   try {
-    await createUserWithEmailAndPassword(auth, email, password);
+    const cred = await createUserWithEmailAndPassword(auth, email, password);
+    const uid = cred.user.uid;
+
+    // Save user data
+    await set(ref(db, `users/${uid}`), {
+      uid,
+      email,
+      username
+    });
+
+    // Map username -> uid
+    await set(ref(db, `usernames/${username}`), uid);
+
     loginPopup.classList.add("hidden");
     showMultiplayerIfLoggedIn();
   } catch (err) {
@@ -159,7 +179,6 @@ onAuthStateChanged(auth, (user) => {
   currentUser = user;
 
   if (!user) {
-    // Logged out → force back to practice
     currentRoomCode = null;
     isHost = false;
     hideRoomUI();
@@ -205,10 +224,18 @@ function listenToPlayers(roomCode) {
 
     Object.values(players).forEach((p) => {
       const li = document.createElement("li");
-      li.textContent = p.name + (p.isHost ? " (Host)" : "");
+      li.textContent = p.username
+        ? `${p.username}${p.isHost ? " (Host)" : ""}`
+        : `${p.name}${p.isHost ? " (Host)" : ""}`;
       playerList.appendChild(li);
     });
   });
+}
+
+async function getUserProfile(uid) {
+  const userRef = ref(db, `users/${uid}`);
+  const snap = await get(userRef);
+  return snap.exists() ? snap.val() : null;
 }
 
 async function createRoom() {
@@ -216,6 +243,9 @@ async function createRoom() {
     loginPopup.classList.remove("hidden");
     return;
   }
+
+  const profile = await getUserProfile(currentUser.uid);
+  const username = profile?.username || currentUser.email;
 
   const code = generateRoomCode();
   const roomRef = ref(db, `rooms/${code}`);
@@ -227,6 +257,7 @@ async function createRoom() {
       [currentUser.uid]: {
         uid: currentUser.uid,
         name: currentUser.email,
+        username,
         isHost: true
       }
     }
@@ -265,10 +296,14 @@ async function joinRoom() {
     return;
   }
 
+  const profile = await getUserProfile(currentUser.uid);
+  const username = profile?.username || currentUser.email;
+
   await update(roomRef, {
     [`players/${currentUser.uid}`]: {
       uid: currentUser.uid,
       name: currentUser.email,
+      username,
       isHost: false
     }
   });
