@@ -118,10 +118,6 @@ h1 {
   background: linear-gradient(145deg, #ff512f, #dd2476);
 }
 
-.hidden {
-  display: none;
-}
-
 /* POPUPS */
 .popup {
   position: fixed;
@@ -183,4 +179,9 @@ h1 {
   background: rgba(255,255,255,0.1);
   padding: 10px;
   border-radius: 12px;
+}
+
+/* ⭐ FIXED: HIDDEN OVERRIDES POPUP */
+.hidden {
+  display: none !important;
 }
