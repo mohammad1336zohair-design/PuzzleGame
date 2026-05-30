@@ -20,11 +20,12 @@ let confettiPieces = [];
 let confettiAnimationId = null;
 
 // --------------------------------------------------
-// BOARD SETUP
+// INIT BOARD
 // --------------------------------------------------
 function initBoard() {
-  tiles = [1, 2, 3, 4, 5, 6, 7, 8, null];
-  shuffleBoard();
+  tiles = generateSolvableBoard();
+  emptyIndex = tiles.indexOf(null);
+
   renderBoard();
   moves = 0;
   updateMoves();
@@ -33,19 +34,48 @@ function initBoard() {
   stopConfetti();
 }
 
-function shuffleBoard() {
-  // Simple shuffle that keeps solvable state (for demo, basic shuffle)
-  for (let i = tiles.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [tiles[i], tiles[j]] = [tiles[j], tiles[i]];
-  }
-  emptyIndex = tiles.indexOf(null);
+// --------------------------------------------------
+// GENERATE SOLVABLE BOARD
+// --------------------------------------------------
+function generateSolvableBoard() {
+  let arr;
+
+  do {
+    arr = [1,2,3,4,5,6,7,8,null];
+    shuffle(arr);
+  } while (!isSolvable(arr));
+
+  return arr;
 }
 
+function shuffle(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+}
+
+function isSolvable(arr) {
+  const nums = arr.filter(n => n !== null);
+  let inversions = 0;
+
+  for (let i = 0; i < nums.length; i++) {
+    for (let j = i + 1; j < nums.length; j++) {
+      if (nums[i] > nums[j]) inversions++;
+    }
+  }
+
+  // For 3x3 puzzle: solvable if inversions is even
+  return inversions % 2 === 0;
+}
+
+// --------------------------------------------------
+// RENDER BOARD
+// --------------------------------------------------
 function renderBoard() {
   board.innerHTML = "";
-  const size = 3;
   const tileSize = 90;
+  const gap = 10;
 
   tiles.forEach((value, index) => {
     if (value === null) return;
@@ -54,13 +84,13 @@ function renderBoard() {
     tile.classList.add("tile");
     tile.textContent = value;
 
-    const row = Math.floor(index / size);
-    const col = index % size;
+    const row = Math.floor(index / 3);
+    const col = index % 3;
 
     tile.style.width = tileSize + "px";
     tile.style.height = tileSize + "px";
-    tile.style.left = col * (tileSize + 10) + "px";
-    tile.style.top = row * (tileSize + 10) + "px";
+    tile.style.left = col * (tileSize + gap) + "px";
+    tile.style.top = row * (tileSize + gap) + "px";
 
     tile.addEventListener("click", () => handleTileClick(index));
 
@@ -80,13 +110,12 @@ function handleTileClick(index) {
 
   [tiles[index], tiles[emptyIndex]] = [tiles[emptyIndex], tiles[index]];
   emptyIndex = index;
+
   moves++;
   updateMoves();
   renderBoard();
 
-  if (checkWin()) {
-    onWin();
-  }
+  if (checkWin()) onWin();
 }
 
 function isAdjacent(i1, i2) {
@@ -95,7 +124,7 @@ function isAdjacent(i1, i2) {
   const r2 = Math.floor(i2 / 3);
   const c2 = i2 % 3;
 
-  return (Math.abs(r1 - r2) + Math.abs(c1 - c2)) === 1;
+  return Math.abs(r1 - r2) + Math.abs(c1 - c2) === 1;
 }
 
 function checkWin() {
@@ -137,13 +166,14 @@ function resizeConfettiCanvas() {
 
 function createConfetti() {
   confettiPieces = [];
-  const count = 200;
+  const count = 150;
+
   for (let i = 0; i < count; i++) {
     confettiPieces.push({
       x: Math.random() * confettiCanvas.width,
       y: Math.random() * confettiCanvas.height - confettiCanvas.height,
       size: 5 + Math.random() * 5,
-      speedY: 2 + Math.random() * 4,
+      speedY: 2 + Math.random() * 3,
       color: `hsl(${Math.random() * 360}, 80%, 60%)`
     });
   }
@@ -156,6 +186,7 @@ function drawConfetti() {
     confettiCtx.fillStyle = p.color;
     confettiCtx.fillRect(p.x, p.y, p.size, p.size);
     p.y += p.speedY;
+
     if (p.y > confettiCanvas.height) {
       p.y = -10;
       p.x = Math.random() * confettiCanvas.width;
