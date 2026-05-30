@@ -43,10 +43,7 @@
       </div>
     </div>
 
-    <!-- CONFETTI -->
-    <canvas id="confetti"></canvas>
-
-    <!-- RESTART BUTTON (MUST BE INSIDE PRACTICE PANEL) -->
+    <!-- RESTART BUTTON -->
     <button id="restartBtn" class="restart-btn hidden">Restart</button>
 
   </div>
@@ -88,6 +85,7 @@
 
       <input id="email" type="email" placeholder="Email">
       <input id="password" type="password" placeholder="Password">
+      <input id="username" type="text" placeholder="Username (for Sign Up)">
 
       <button id="signupBtn" class="popup-btn">Sign Up</button>
       <button id="loginBtn" class="popup-btn">Login</button>
@@ -105,6 +103,9 @@
       <button id="leaveNo" class="popup-btn">Stay</button>
     </div>
   </div>
+
+  <!-- CONFETTI CANVAS (OVERLAY, NOT PUSHING LAYOUT) -->
+  <canvas id="confetti"></canvas>
 
   <!-- JS FILES -->
   <script type="module" src="practice.js"></script>
