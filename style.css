@@ -82,16 +82,18 @@ h1 {
 
 /* BOARD */
 #board {
-  width: 340px;
-  height: 340px;
+  width: 320px;   /* 3 tiles * 90 + 2 gaps * 10 = 320 incl padding */
+  height: 320px;
   margin-top: 30px;
   position: relative;
   padding: 15px;
   border-radius: 30px;
   background: rgba(255,255,255,0.08);
   backdrop-filter: blur(15px);
+  overflow: hidden; /* keep tiles inside */
 }
 
+/* TILES */
 .tile {
   position: absolute;
   display: flex;
@@ -103,6 +105,9 @@ h1 {
   cursor: pointer;
   color: white;
   background: linear-gradient(145deg, #00c6ff, #0072ff);
+
+  /* smooth movement when left/top change */
+  transition: top 0.15s ease, left 0.15s ease;
 }
 
 /* RESTART BUTTON */
@@ -203,7 +208,7 @@ input[type="text"],
   height: 100vh;
   pointer-events: none;
   z-index: 1000;
-  display: none;
+  display: none; /* JS will set to block when needed */
 }
 
 /* HIDDEN OVERRIDES EVERYTHING */
