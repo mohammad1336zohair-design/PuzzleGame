@@ -154,6 +154,19 @@ h1 {
   background: linear-gradient(145deg, #ff512f, #dd2476);
 }
 
+/* INPUTS */
+input[type="email"],
+input[type="password"],
+input[type="text"],
+#roomInput {
+  width: 100%;
+  padding: 10px 12px;
+  margin-top: 10px;
+  border-radius: 10px;
+  border: 1px solid #ccc;
+  font-size: 16px;
+}
+
 /* MULTIPLAYER PANEL */
 #multiplayerPanel {
   margin-top: 20px;
@@ -181,7 +194,19 @@ h1 {
   border-radius: 12px;
 }
 
-/* ⭐ FIXED: HIDDEN OVERRIDES POPUP */
+/* CONFETTI CANVAS OVERLAY */
+#confetti {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 1000;
+  display: none;
+}
+
+/* HIDDEN OVERRIDES EVERYTHING */
 .hidden {
   display: none !important;
 }
