@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0">
+
+  <title>8 Puzzle Game</title>
+
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <div id="navbar">
+    <button id="practiceTab" class="nav-btn active">
+      Practice
+    </button>
+
+    <button id="multiplayerTab" class="nav-btn">
+      Multiplayer
+    </button>
+  </div>
+
+  <h1>8 Puzzle Game</h1>
+
+  <!-- PRACTICE PANEL -->
+  <div id="practicePanel">
+
+    <!-- MOVES -->
+    <div id="moves">Moves: 0</div>
+
+    <!-- BOARD -->
+    <div id="board"></div>
+
+    <!-- WIN POPUP -->
+    <div id="winPopup" class="popup hidden">
+      <div class="popup-content">
+        <h2>You Win!</h2>
+        <p id="moveCountText"></p>
+        <button id="closePopup" class="popup-btn">Close</button>
+      </div>
+    </div>
+
+    <!-- CONFETTI -->
+    <canvas id="confetti"></canvas>
+
+    <!-- RESTART BUTTON (MUST BE INSIDE PRACTICE PANEL) -->
+    <button id="restartBtn" class="restart-btn hidden">Restart</button>
+
+  </div>
+
+  <!-- MULTIPLAYER PANEL -->
+  <div id="multiplayerPanel" class="hidden">
+
+    <button id="createRoomBtn" class="multi-btn">
+      Create Room
+    </button>
+
+    <input id="roomInput" placeholder="Enter Room Code">
+
+    <button id="joinRoomBtn" class="multi-btn">
+      Join Room
+    </button>
+
+    <div id="roomCodeText"></div>
+
+    <div id="playerListContainer" class="hidden">
+      <h3>Players</h3>
+      <ul id="playerList"></ul>
+    </div>
+
+    <button id="startMatchBtn" class="multi-btn hidden">
+      Start Match
+    </button>
+
+    <button id="leaveMatchBtn" class="multi-btn hidden">
+      Leave Match
+    </button>
+
+  </div>
+
+  <!-- LOGIN POPUP -->
+  <div id="loginPopup" class="popup hidden">
+    <div class="popup-content">
+      <h2>Login Required</h2>
+
+      <input id="email" type="email" placeholder="Email">
+      <input id="password" type="password" placeholder="Password">
+
+      <button id="signupBtn" class="popup-btn">Sign Up</button>
+      <button id="loginBtn" class="popup-btn">Login</button>
+      <button id="closeLogin" class="popup-btn">Close</button>
+    </div>
+  </div>
+
+  <!-- LEAVE MATCH POPUP -->
+  <div id="leavePopup" class="popup hidden">
+    <div class="popup-content">
+      <h2>Leave Match?</h2>
+      <p>You will leave the multiplayer match.</p>
+
+      <button id="leaveYes" class="popup-btn">Leave Match</button>
+      <button id="leaveNo" class="popup-btn">Stay</button>
+    </div>
+  </div>
+
+  <!-- JS FILES -->
+  <script type="module" src="practice.js"></script>
+  <script type="module" src="multiplayer.js"></script>
+
+</body>
+</html>
