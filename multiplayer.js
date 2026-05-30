@@ -52,14 +52,14 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
 // --------------------------------------------------
-// FIREBASE CONFIG (PUT YOURS HERE)
+// FIREBASE CONFIG (FIXED BUCKET)
 // --------------------------------------------------
 const firebaseConfig = {
   apiKey: "AIzaSyC7J59ExJVU3j9meWZxpopAA0IqutOgX6Q",
   authDomain: "puzzle-multiplayer-8.firebaseapp.com",
   databaseURL: "https://puzzle-multiplayer-8-default-rtdb.asia-southeast1.firebasedatabase.app",
   projectId: "puzzle-multiplayer-8",
-  storageBucket: "puzzle-multiplayer-8.firebasestorage.app",
+  storageBucket: "puzzle-multiplayer-8.appspot.com",
   messagingSenderId: "513197674871",
   appId: "1:513197674871:web:9a6553631d87518e5ad172",
   measurementId: "G-FZPL8KLPQ7"
