@@ -1,26 +1,93 @@
-#board {
-  width: 350px;
-  height: 350px;
-  margin-top: 30px;
-  position: relative;
+/* GLOBAL DARK BACKGROUND */
+body {
+  margin: 0;
   padding: 0;
-  border-radius: 30px;
-  background: rgba(255,255,255,0.08);
-  backdrop-filter: blur(15px);
-  overflow: hidden;
+  background: #0f0f0f;
+  font-family: Arial, sans-serif;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
-.tile {
-  position: absolute;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 110px;
-  height: 110px;
-  font-size: 48px;
+/* MAIN TITLE */
+h1 {
+  margin-top: 20px;
+  font-size: 32px;
   font-weight: bold;
-  border-radius: 22px;
-  cursor: pointer;
   color: white;
-  background: linear-gradient(145deg, #00c6ff, #0072ff);
+}
+
+/* POPUP BASE */
+.popup {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 300px;
+  padding: 20px;
+  border-radius: 20px;
+  background: rgba(255,255,255,0.1);
+  backdrop-filter: blur(20px);
+  color: white;
+  text-align: center;
+  z-index: 999;
+  display: none;
+}
+
+/* SHOW POPUP */
+.popup:not(.hidden) {
+  display: block;
+}
+
+/* POPUP BUTTONS */
+.popup button {
+  margin-top: 15px;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 12px;
+  background: #0072ff;
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+/* INPUT FIELDS */
+input {
+  width: 90%;
+  padding: 10px;
+  margin-top: 10px;
+  border-radius: 12px;
+  border: none;
+  outline: none;
+  background: rgba(255,255,255,0.15);
+  color: white;
+}
+
+/* BUTTONS */
+button {
+  padding: 12px 20px;
+  margin: 10px;
+  border-radius: 12px;
+  border: none;
+  background: #00c6ff;
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+/* PLAYER LIST BOX */
+#playerListContainer {
+  margin-top: 20px;
+  padding: 15px;
+  width: 300px;
+  border-radius: 20px;
+  background: rgba(255,255,255,0.08);
+  backdrop-filter: blur(15px);
+}
+
+#playerList li {
+  list-style: none;
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.2);
 }
