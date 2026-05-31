@@ -10,6 +10,11 @@ const restartBtn = document.getElementById("restartBtn");
 const confettiCanvas = document.getElementById("confetti");
 const confettiCtx = confettiCanvas.getContext("2d");
 
+const practiceTab = document.getElementById("practiceTab");
+const multiplayerTab = document.getElementById("multiplayerTab");
+const practicePanel = document.getElementById("practicePanel");
+const multiplayerPanel = document.getElementById("multiplayerPanel");
+
 // --------------------------------------------------
 // STATE
 // --------------------------------------------------
@@ -20,13 +25,34 @@ let confettiPieces = [];
 let confettiAnimationId = null;
 
 // --------------------------------------------------
+// TABS
+// --------------------------------------------------
+function showPractice() {
+  practiceTab.classList.add("active");
+  multiplayerTab.classList.remove("active");
+  practicePanel.classList.remove("hidden");
+  multiplayerPanel.classList.add("hidden");
+}
+
+function showMultiplayer() {
+  practiceTab.classList.remove("active");
+  multiplayerTab.classList.add("active");
+  practicePanel.classList.add("hidden");
+  multiplayerPanel.classList.remove("hidden");
+}
+
+practiceTab.addEventListener("click", showPractice);
+// multiplayerTab click is handled in multiplayer.js (auth check)
+
+// --------------------------------------------------
 // INIT BOARD
 // --------------------------------------------------
 function initBoard() {
   tiles = generateSolvableBoard();
   emptyIndex = tiles.indexOf(null);
 
-  renderBoard();
+  createTiles();
+  updateTilePositions();
   moves = 0;
   updateMoves();
   hideWin();
@@ -39,12 +65,10 @@ function initBoard() {
 // --------------------------------------------------
 function generateSolvableBoard() {
   let arr;
-
   do {
     arr = [1,2,3,4,5,6,7,8,null];
     shuffle(arr);
   } while (!isSolvable(arr) || isAlreadySolved(arr));
-
   return arr;
 }
 
@@ -65,41 +89,53 @@ function shuffle(arr) {
 function isSolvable(arr) {
   const nums = arr.filter(n => n !== null);
   let inversions = 0;
-
   for (let i = 0; i < nums.length; i++) {
     for (let j = i + 1; j < nums.length; j++) {
       if (nums[i] > nums[j]) inversions++;
     }
   }
-
   return inversions % 2 === 0;
 }
 
 // --------------------------------------------------
-// RENDER BOARD (no animation, just correct)
+// CREATE TILES ONCE
 // --------------------------------------------------
-function renderBoard() {
+function createTiles() {
   board.innerHTML = "";
 
-  const tileSize = 110;
-  const gap = 10;
-
-  tiles.forEach((value, index) => {
+  tiles.forEach((value) => {
     if (value === null) return;
 
     const tile = document.createElement("div");
     tile.classList.add("tile");
     tile.textContent = value;
 
+    tile.addEventListener("click", () => {
+      const currentIndex = tiles.indexOf(value);
+      handleTileClick(currentIndex);
+    });
+
+    board.appendChild(tile);
+  });
+}
+
+// --------------------------------------------------
+// UPDATE TILE POSITIONS (smooth)
+// --------------------------------------------------
+function updateTilePositions() {
+  const tileSize = 110;
+  const gap = 10;
+
+  const tileElements = document.querySelectorAll(".tile");
+
+  tileElements.forEach(tile => {
+    const value = parseInt(tile.textContent);
+    const index = tiles.indexOf(value);
     const row = Math.floor(index / 3);
     const col = index % 3;
 
     tile.style.left = col * (tileSize + gap) + "px";
     tile.style.top = row * (tileSize + gap) + "px";
-
-    tile.addEventListener("click", () => handleTileClick(index));
-
-    board.appendChild(tile);
   });
 }
 
@@ -118,7 +154,7 @@ function handleTileClick(index) {
 
   moves++;
   updateMoves();
-  renderBoard();
+  updateTilePositions();
 
   if (checkWin()) onWin();
 }
@@ -128,7 +164,6 @@ function isAdjacent(i1, i2) {
   const c1 = i1 % 3;
   const r2 = Math.floor(i2 / 3);
   const c2 = i2 % 3;
-
   return Math.abs(r1 - r2) + Math.abs(c1 - c2) === 1;
 }
 
@@ -162,7 +197,7 @@ function hideRestart() {
 }
 
 // --------------------------------------------------
-// CONFETTI (same as before)
+// CONFETTI
 // --------------------------------------------------
 function resizeConfettiCanvas() {
   confettiCanvas.width = window.innerWidth;
@@ -172,7 +207,6 @@ function resizeConfettiCanvas() {
 function createConfetti() {
   confettiPieces = [];
   const count = 150;
-
   for (let i = 0; i < count; i++) {
     confettiPieces.push({
       x: Math.random() * confettiCanvas.width,
@@ -186,18 +220,15 @@ function createConfetti() {
 
 function drawConfetti() {
   confettiCtx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
-
   confettiPieces.forEach(p => {
     confettiCtx.fillStyle = p.color;
     confettiCtx.fillRect(p.x, p.y, p.size, p.size);
     p.y += p.speedY;
-
     if (p.y > confettiCanvas.height) {
       p.y = -10;
       p.x = Math.random() * confettiCanvas.width;
     }
   });
-
   confettiAnimationId = requestAnimationFrame(drawConfetti);
 }
 
@@ -238,4 +269,5 @@ restartBtn.addEventListener("click", () => {
 // --------------------------------------------------
 // INIT
 // --------------------------------------------------
+showPractice();
 initBoard();
