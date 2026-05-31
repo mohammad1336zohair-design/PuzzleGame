@@ -1,17 +1,15 @@
-/* BOARD */
 #board {
-  width: 350px;      /* EXACT size for 110px tiles + 10px gaps */
+  width: 350px;
   height: 350px;
   margin-top: 30px;
   position: relative;
-  padding: 0;        /* IMPORTANT: must be 0 or tiles shift */
+  padding: 0;
   border-radius: 30px;
   background: rgba(255,255,255,0.08);
   backdrop-filter: blur(15px);
   overflow: hidden;
 }
 
-/* TILES */
 .tile {
   position: absolute;
   display: flex;
@@ -25,7 +23,4 @@
   cursor: pointer;
   color: white;
   background: linear-gradient(145deg, #00c6ff, #0072ff);
-
-  /* Smooth sliding animation */
-  transition: top 0.18s ease, left 0.18s ease;
 }
