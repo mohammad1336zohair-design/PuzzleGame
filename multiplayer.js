@@ -52,7 +52,7 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
 // --------------------------------------------------
-// FIREBASE CONFIG (FIXED BUCKET)
+// FIREBASE CONFIG
 // --------------------------------------------------
 const firebaseConfig = {
   apiKey: "AIzaSyC7J59ExJVU3j9meWZxpopAA0IqutOgX6Q",
@@ -77,12 +77,11 @@ let currentRoomCode = null;
 let isHost = false;
 
 // --------------------------------------------------
-// TAB SWITCHING
+// TAB SWITCHING (multiplayer side)
 // --------------------------------------------------
-function showPractice() {
+function showPracticeOnly() {
   practiceTab.classList.add("active");
   multiplayerTab.classList.remove("active");
-
   practicePanel.classList.remove("hidden");
   multiplayerPanel.classList.add("hidden");
 }
@@ -90,22 +89,19 @@ function showPractice() {
 function showMultiplayerIfLoggedIn() {
   multiplayerTab.classList.add("active");
   practiceTab.classList.remove("active");
-
   practicePanel.classList.add("hidden");
   multiplayerPanel.classList.remove("hidden");
 }
 
 function handleMultiplayerClick() {
   if (!currentUser) {
-    showPractice();
+    showPracticeOnly();
     loginPopup.classList.remove("hidden");
     return;
   }
-
   showMultiplayerIfLoggedIn();
 }
 
-practiceTab.addEventListener("click", showPractice);
 multiplayerTab.addEventListener("click", handleMultiplayerClick);
 
 // --------------------------------------------------
@@ -125,10 +121,8 @@ signupBtn.addEventListener("click", async () => {
     return;
   }
 
-  // Check if username already exists
   const usernameRef = ref(db, `usernames/${username}`);
   const usernameSnap = await get(usernameRef);
-
   if (usernameSnap.exists()) {
     alert("Username already in use. Choose another.");
     return;
@@ -138,14 +132,12 @@ signupBtn.addEventListener("click", async () => {
     const cred = await createUserWithEmailAndPassword(auth, email, password);
     const uid = cred.user.uid;
 
-    // Save user data
     await set(ref(db, `users/${uid}`), {
       uid,
       email,
       username
     });
 
-    // Map username -> uid
     await set(ref(db, `usernames/${username}`), uid);
 
     loginPopup.classList.add("hidden");
@@ -183,7 +175,7 @@ onAuthStateChanged(auth, (user) => {
     currentRoomCode = null;
     isHost = false;
     hideRoomUI();
-    showPractice();
+    showPracticeOnly();
   }
 });
 
@@ -218,11 +210,9 @@ function hideRoomUI() {
 
 function listenToPlayers(roomCode) {
   const playersRef = ref(db, `rooms/${roomCode}/players`);
-
   onValue(playersRef, (snapshot) => {
     playerList.innerHTML = "";
     const players = snapshot.val() || {};
-
     Object.values(players).forEach((p) => {
       const li = document.createElement("li");
       li.textContent = p.username
@@ -324,10 +314,8 @@ joinRoomBtn.addEventListener("click", joinRoom);
 // --------------------------------------------------
 startMatchBtn.addEventListener("click", async () => {
   if (!isHost || !currentRoomCode) return;
-
   const roomRef = ref(db, `rooms/${currentRoomCode}`);
   await update(roomRef, { status: "in-game" });
-
   alert("Match started! (Puzzle sync comes next.)");
 });
 
@@ -369,8 +357,3 @@ leaveYes.addEventListener("click", async () => {
   isHost = false;
   hideRoomUI();
 });
-
-// --------------------------------------------------
-// DEFAULT TAB
-// --------------------------------------------------
-showPractice();
