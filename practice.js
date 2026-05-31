@@ -26,8 +26,7 @@ function initBoard() {
   tiles = generateSolvableBoard();
   emptyIndex = tiles.indexOf(null);
 
-  createTiles();          // Create DOM tiles once
-  updateTilePositions();  // Smooth animation
+  renderBoard();
   moves = 0;
   updateMoves();
   hideWin();
@@ -44,9 +43,16 @@ function generateSolvableBoard() {
   do {
     arr = [1,2,3,4,5,6,7,8,null];
     shuffle(arr);
-  } while (!isSolvable(arr));
+  } while (!isSolvable(arr) || isAlreadySolved(arr));
 
   return arr;
+}
+
+function isAlreadySolved(arr) {
+  for (let i = 0; i < 8; i++) {
+    if (arr[i] !== i + 1) return false;
+  }
+  return arr[8] === null;
 }
 
 function shuffle(arr) {
@@ -70,46 +76,30 @@ function isSolvable(arr) {
 }
 
 // --------------------------------------------------
-// CREATE TILES ONCE
+// RENDER BOARD (no animation, just correct)
 // --------------------------------------------------
-function createTiles() {
+function renderBoard() {
   board.innerHTML = "";
 
-  tiles.forEach((value) => {
+  const tileSize = 110;
+  const gap = 10;
+
+  tiles.forEach((value, index) => {
     if (value === null) return;
 
     const tile = document.createElement("div");
     tile.classList.add("tile");
     tile.textContent = value;
 
-    // FIXED: tile always uses its REAL current index
-    tile.addEventListener("click", () => {
-      const currentIndex = tiles.indexOf(value);
-      handleTileClick(currentIndex);
-    });
-
-    board.appendChild(tile);
-  });
-}
-
-// --------------------------------------------------
-// UPDATE TILE POSITIONS (smooth animation)
-// --------------------------------------------------
-function updateTilePositions() {
-  const tileSize = 110;
-  const gap = 10;
-
-  const tileElements = document.querySelectorAll(".tile");
-
-  tileElements.forEach(tile => {
-    const value = parseInt(tile.textContent);
-    const index = tiles.indexOf(value);
-
     const row = Math.floor(index / 3);
     const col = index % 3;
 
     tile.style.left = col * (tileSize + gap) + "px";
     tile.style.top = row * (tileSize + gap) + "px";
+
+    tile.addEventListener("click", () => handleTileClick(index));
+
+    board.appendChild(tile);
   });
 }
 
@@ -128,7 +118,7 @@ function handleTileClick(index) {
 
   moves++;
   updateMoves();
-  updateTilePositions(); // smooth animation
+  renderBoard();
 
   if (checkWin()) onWin();
 }
@@ -172,7 +162,7 @@ function hideRestart() {
 }
 
 // --------------------------------------------------
-// CONFETTI (unchanged)
+// CONFETTI (same as before)
 // --------------------------------------------------
 function resizeConfettiCanvas() {
   confettiCanvas.width = window.innerWidth;
