@@ -26,8 +26,8 @@ function initBoard() {
   tiles = generateSolvableBoard();
   emptyIndex = tiles.indexOf(null);
 
-  createTiles();   // create DOM tiles ONCE
-  updateTilePositions(); // animate positions
+  createTiles();          // Create DOM tiles once
+  updateTilePositions();  // Smooth animation
   moves = 0;
   updateMoves();
   hideWin();
@@ -75,15 +75,18 @@ function isSolvable(arr) {
 function createTiles() {
   board.innerHTML = "";
 
-  tiles.forEach((value, index) => {
+  tiles.forEach((value) => {
     if (value === null) return;
 
     const tile = document.createElement("div");
     tile.classList.add("tile");
     tile.textContent = value;
-    tile.dataset.index = index;
 
-    tile.addEventListener("click", () => handleTileClick(index));
+    // FIXED: tile always uses its REAL current index
+    tile.addEventListener("click", () => {
+      const currentIndex = tiles.indexOf(value);
+      handleTileClick(currentIndex);
+    });
 
     board.appendChild(tile);
   });
@@ -99,7 +102,9 @@ function updateTilePositions() {
   const tileElements = document.querySelectorAll(".tile");
 
   tileElements.forEach(tile => {
-    const index = tiles.indexOf(parseInt(tile.textContent));
+    const value = parseInt(tile.textContent);
+    const index = tiles.indexOf(value);
+
     const row = Math.floor(index / 3);
     const col = index % 3;
 
