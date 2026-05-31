@@ -1,236 +1,203 @@
-// --------------------------------------------------
-// DOM ELEMENTS
-// --------------------------------------------------
 const board = document.getElementById("board");
 const movesText = document.getElementById("moves");
-const winPopup = document.getElementById("winPopup");
+const popup = document.getElementById("winPopup");
 const moveCountText = document.getElementById("moveCountText");
 const closePopup = document.getElementById("closePopup");
-const restartBtn = document.getElementById("restartBtn");
-const confettiCanvas = document.getElementById("confetti");
-const confettiCtx = confettiCanvas.getContext("2d");
 
-// --------------------------------------------------
-// STATE
-// --------------------------------------------------
-let tiles = [];
-let emptyIndex = 8;
+const canvas = document.getElementById("confetti");
+const ctx = canvas.getContext("2d");
+
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+let confetti = [];
+let confettiRunning = false;
+
 let moves = 0;
-let confettiPieces = [];
-let confettiAnimationId = null;
+let gameOver = false;
 
-// --------------------------------------------------
-// INIT BOARD
-// --------------------------------------------------
+let tiles = [1, 2, 3, 4, 5, 6, 7, 8, ""];
+let tileElements = {};
+
+const PADDING = 15;
+const GAP = 10;
+const BOARD_SIZE = 340;
+const CELL_SIZE = (BOARD_SIZE - 2 * PADDING - 2 * GAP) / 3;
+
+function getTilePosition(index) {
+  const col = index % 3;
+  const row = Math.floor(index / 3);
+  return {
+    x: PADDING + col * (CELL_SIZE + GAP),
+    y: PADDING + row * (CELL_SIZE + GAP),
+  };
+}
+
 function initBoard() {
-  tiles = generateSolvableBoard();
-  emptyIndex = tiles.indexOf(null);
-
-  renderBoard();
-  moves = 0;
-  updateMoves();
-  hideWin();
-  hideRestart();
-  stopConfetti();
-}
-
-// --------------------------------------------------
-// GENERATE SOLVABLE BOARD
-// --------------------------------------------------
-function generateSolvableBoard() {
-  let arr;
-
-  do {
-    arr = [1,2,3,4,5,6,7,8,null];
-    shuffle(arr);
-  } while (!isSolvable(arr));
-
-  return arr;
-}
-
-function shuffle(arr) {
-  for (let i = arr.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [arr[i], arr[j]] = [arr[j], arr[i]];
-  }
-}
-
-function isSolvable(arr) {
-  const nums = arr.filter(n => n !== null);
-  let inversions = 0;
-
-  for (let i = 0; i < nums.length; i++) {
-    for (let j = i + 1; j < nums.length; j++) {
-      if (nums[i] > nums[j]) inversions++;
-    }
-  }
-
-  // For 3x3 puzzle: solvable if inversions is even
-  return inversions % 2 === 0;
-}
-
-// --------------------------------------------------
-// RENDER BOARD
-// --------------------------------------------------
-function renderBoard() {
   board.innerHTML = "";
-  const tileSize = 90;
-  const gap = 10;
+  tileElements = {};
 
-  tiles.forEach((value, index) => {
-    if (value === null) return;
+  tiles.forEach((tile, index) => {
+    if (tile === "") return;
 
-    const tile = document.createElement("div");
-    tile.classList.add("tile");
-    tile.textContent = value;
+    const tileDiv = document.createElement("div");
+    tileDiv.classList.add("tile");
+    tileDiv.textContent = tile;
+    tileDiv.setAttribute("data-value", tile);
 
-    const row = Math.floor(index / 3);
-    const col = index % 3;
+    tileDiv.style.width = CELL_SIZE + "px";
+    tileDiv.style.height = CELL_SIZE + "px";
 
-    tile.style.width = tileSize + "px";
-    tile.style.height = tileSize + "px";
-    tile.style.left = col * (tileSize + gap) + "px";
-    tile.style.top = row * (tileSize + gap) + "px";
+    const pos = getTilePosition(index);
+    tileDiv.style.left = pos.x + "px";
+    tileDiv.style.top = pos.y + "px";
 
-    tile.addEventListener("click", () => handleTileClick(index));
+    tileDiv.addEventListener("click", () => {
+      const value = parseInt(tileDiv.getAttribute("data-value"));
+      moveTile(tiles.indexOf(value));
+    });
 
-    board.appendChild(tile);
+    tileElements[tile] = tileDiv;
+    board.appendChild(tileDiv);
   });
 }
 
-function updateMoves() {
-  movesText.textContent = "Moves: " + moves;
+function renderBoard() {
+  tiles.forEach((tile, index) => {
+    if (tile === "") return;
+    const tileDiv = tileElements[tile];
+    const pos = getTilePosition(index);
+    tileDiv.style.left = pos.x + "px";
+    tileDiv.style.top = pos.y + "px";
+  });
 }
 
-// --------------------------------------------------
-// GAME LOGIC
-// --------------------------------------------------
-function handleTileClick(index) {
-  if (!isAdjacent(index, emptyIndex)) return;
+function moveTile(index) {
+  if (gameOver) return;
 
-  [tiles[index], tiles[emptyIndex]] = [tiles[emptyIndex], tiles[index]];
-  emptyIndex = index;
+  const emptyIndex = tiles.indexOf("");
 
-  moves++;
-  updateMoves();
-  renderBoard();
+  const sameRow =
+    Math.floor(index / 3) === Math.floor(emptyIndex / 3);
 
-  if (checkWin()) onWin();
+  const validMove =
+    (sameRow && Math.abs(index - emptyIndex) === 1) ||
+    Math.abs(index - emptyIndex) === 3;
+
+  if (validMove) {
+    [tiles[index], tiles[emptyIndex]] =
+    [tiles[emptyIndex], tiles[index]];
+
+    moves++;
+    movesText.textContent = "Moves: " + moves;
+
+    renderBoard();
+    checkWin();
+  }
 }
 
-function isAdjacent(i1, i2) {
-  const r1 = Math.floor(i1 / 3);
-  const c1 = i1 % 3;
-  const r2 = Math.floor(i2 / 3);
-  const c2 = i2 % 3;
+function shuffleBoard() {
+  tiles = [1,2,3,4,5,6,7,8,""];
+  moves = 0;
+  gameOver = false;
 
-  return Math.abs(r1 - r2) + Math.abs(c1 - c2) === 1;
+  movesText.textContent = "Moves: 0";
+
+  for (let i = 0; i < 200; i++) {
+    const emptyIndex = tiles.indexOf("");
+
+    const possibleMoves = [];
+
+    if (emptyIndex - 3 >= 0) possibleMoves.push(emptyIndex - 3);
+    if (emptyIndex + 3 < 9) possibleMoves.push(emptyIndex + 3);
+    if (emptyIndex % 3 !== 0) possibleMoves.push(emptyIndex - 1);
+    if (emptyIndex % 3 !== 2) possibleMoves.push(emptyIndex + 1);
+
+    const randomMove =
+      possibleMoves[Math.floor(Math.random() * possibleMoves.length)];
+
+    [tiles[emptyIndex], tiles[randomMove]] =
+    [tiles[randomMove], tiles[emptyIndex]];
+  }
+
+  initBoard();
 }
 
 function checkWin() {
-  for (let i = 0; i < 8; i++) {
-    if (tiles[i] !== i + 1) return false;
-  }
-  return tiles[8] === null;
-}
+  const win = [1,2,3,4,5,6,7,8,""];
 
-// --------------------------------------------------
-// WIN HANDLING
-// --------------------------------------------------
-function onWin() {
-  moveCountText.textContent = `You solved it in ${moves} moves!`;
-  winPopup.classList.remove("hidden");
-  showRestart();
-  startConfetti();
-}
+  if (JSON.stringify(tiles) === JSON.stringify(win)) {
+    gameOver = true;
 
-function hideWin() {
-  winPopup.classList.add("hidden");
-}
+    setTimeout(() => {
+      moveCountText.textContent =
+        "You solved it in " + moves + " moves!";
 
-function showRestart() {
-  restartBtn.classList.remove("hidden");
-}
+      popup.classList.remove("hidden");
 
-function hideRestart() {
-  restartBtn.classList.add("hidden");
-}
+      startConfetti();
+      showRestartButton();
 
-// --------------------------------------------------
-// CONFETTI
-// --------------------------------------------------
-function resizeConfettiCanvas() {
-  confettiCanvas.width = window.innerWidth;
-  confettiCanvas.height = window.innerHeight;
-}
-
-function createConfetti() {
-  confettiPieces = [];
-  const count = 150;
-
-  for (let i = 0; i < count; i++) {
-    confettiPieces.push({
-      x: Math.random() * confettiCanvas.width,
-      y: Math.random() * confettiCanvas.height - confettiCanvas.height,
-      size: 5 + Math.random() * 5,
-      speedY: 2 + Math.random() * 3,
-      color: `hsl(${Math.random() * 360}, 80%, 60%)`
-    });
+    }, 250);
   }
 }
 
-function drawConfetti() {
-  confettiCtx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
+closePopup.addEventListener("click", () => {
+  popup.classList.add("hidden");
+});
 
-  confettiPieces.forEach(p => {
-    confettiCtx.fillStyle = p.color;
-    confettiCtx.fillRect(p.x, p.y, p.size, p.size);
-    p.y += p.speedY;
+const restartBtn = document.createElement("button");
+restartBtn.textContent = "Restart";
+restartBtn.classList.add("restart-btn");
+restartBtn.style.display = "none";
+document.body.appendChild(restartBtn);
 
-    if (p.y > confettiCanvas.height) {
-      p.y = -10;
-      p.x = Math.random() * confettiCanvas.width;
-    }
-  });
+restartBtn.addEventListener("click", () => {
+  restartBtn.style.display = "none";
+  shuffleBoard();
+});
 
-  confettiAnimationId = requestAnimationFrame(drawConfetti);
+function showRestartButton() {
+  restartBtn.style.display = "inline-block";
 }
 
 function startConfetti() {
-  resizeConfettiCanvas();
-  createConfetti();
-  confettiCanvas.style.display = "block";
-  drawConfetti();
+  confetti = [];
+  confettiRunning = true;
+
+  for (let i = 0; i < 120; i++) {
+    confetti.push({
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height - canvas.height,
+      r: Math.random() * 6 + 3,
+      d: Math.random() * 10 + 5,
+      color: `hsl(${Math.random() * 360}, 100%, 60%)`,
+      tilt: Math.random() * 10 - 10
+    });
+  }
+
+  animateConfetti();
+
+  setTimeout(() => {
+    confettiRunning = false;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+  }, 10000);
 }
 
-function stopConfetti() {
-  if (confettiAnimationId) {
-    cancelAnimationFrame(confettiAnimationId);
-    confettiAnimationId = null;
-  }
-  confettiCanvas.style.display = "none";
-  confettiCtx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
+function animateConfetti() {
+  if (!confettiRunning) return;
+
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  confetti.forEach(c => {
+    ctx.fillStyle = c.color;
+    ctx.fillRect(c.x, c.y, c.r, c.r);
+
+    c.y += c.d;
+    c.x += Math.sin(c.tilt);
+  });
+
+  requestAnimationFrame(animateConfetti);
 }
 
-window.addEventListener("resize", () => {
-  if (confettiCanvas.style.display === "block") {
-    resizeConfettiCanvas();
-  }
-});
-
-// --------------------------------------------------
-// EVENTS
-// --------------------------------------------------
-closePopup.addEventListener("click", () => {
-  hideWin();
-  stopConfetti();
-});
-
-restartBtn.addEventListener("click", () => {
-  initBoard();
-});
-
-// --------------------------------------------------
-// INIT
-// --------------------------------------------------
-initBoard();
+shuffleBoard();
