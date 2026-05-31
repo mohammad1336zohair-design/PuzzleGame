@@ -1,3 +1,5 @@
+import { showPractice, showMultiplayer } from "./practice.js";
+
 // --------------------------------------------------
 // DOM ELEMENTS
 // --------------------------------------------------
@@ -77,38 +79,26 @@ let currentRoomCode = null;
 let isHost = false;
 
 // --------------------------------------------------
-// TAB SWITCHING (multiplayer side)
+// TAB SWITCHING
 // --------------------------------------------------
-function showPracticeOnly() {
-  practiceTab.classList.add("active");
-  multiplayerTab.classList.remove("active");
-  practicePanel.classList.remove("hidden");
-  multiplayerPanel.classList.add("hidden");
-}
+practiceTab.addEventListener("click", () => {
+  showPractice();
+});
 
-function showMultiplayerIfLoggedIn() {
-  multiplayerTab.classList.add("active");
-  practiceTab.classList.remove("active");
-  practicePanel.classList.add("hidden");
-  multiplayerPanel.classList.remove("hidden");
-}
-
-function handleMultiplayerClick() {
+multiplayerTab.addEventListener("click", () => {
   if (!currentUser) {
-    showPracticeOnly();
     loginPopup.classList.remove("hidden");
     return;
   }
-  showMultiplayerIfLoggedIn();
-}
-
-multiplayerTab.addEventListener("click", handleMultiplayerClick);
+  showMultiplayer();
+});
 
 // --------------------------------------------------
 // LOGIN POPUP
 // --------------------------------------------------
 closeLogin.addEventListener("click", () => {
   loginPopup.classList.add("hidden");
+  showPractice();
 });
 
 signupBtn.addEventListener("click", async () => {
@@ -141,7 +131,7 @@ signupBtn.addEventListener("click", async () => {
     await set(ref(db, `usernames/${username}`), uid);
 
     loginPopup.classList.add("hidden");
-    showMultiplayerIfLoggedIn();
+    showMultiplayer();
   } catch (err) {
     alert(err.message);
   }
@@ -159,7 +149,7 @@ loginBtn.addEventListener("click", async () => {
   try {
     await signInWithEmailAndPassword(auth, email, password);
     loginPopup.classList.add("hidden");
-    showMultiplayerIfLoggedIn();
+    showMultiplayer();
   } catch (err) {
     alert(err.message);
   }
@@ -175,7 +165,7 @@ onAuthStateChanged(auth, (user) => {
     currentRoomCode = null;
     isHost = false;
     hideRoomUI();
-    showPracticeOnly();
+    showPractice();
   }
 });
 
@@ -316,7 +306,7 @@ startMatchBtn.addEventListener("click", async () => {
   if (!isHost || !currentRoomCode) return;
   const roomRef = ref(db, `rooms/${currentRoomCode}`);
   await update(roomRef, { status: "in-game" });
-  alert("Match started! (Puzzle sync comes next.)");
+  alert("Match started! (Puzzle sync can be added next.)");
 });
 
 // --------------------------------------------------
@@ -356,4 +346,5 @@ leaveYes.addEventListener("click", async () => {
   currentRoomCode = null;
   isHost = false;
   hideRoomUI();
+  showPractice();
 });
