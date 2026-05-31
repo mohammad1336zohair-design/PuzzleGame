@@ -25,24 +25,23 @@ let confettiPieces = [];
 let confettiAnimationId = null;
 
 // --------------------------------------------------
-// TABS
+// TAB VIEW HELPERS (practice side)
 // --------------------------------------------------
-function showPractice() {
+export function showPractice() {
   practiceTab.classList.add("active");
   multiplayerTab.classList.remove("active");
   practicePanel.classList.remove("hidden");
   multiplayerPanel.classList.add("hidden");
+  movesText.style.display = "block";
 }
 
-function showMultiplayer() {
+export function showMultiplayer() {
   practiceTab.classList.remove("active");
   multiplayerTab.classList.add("active");
   practicePanel.classList.add("hidden");
   multiplayerPanel.classList.remove("hidden");
+  movesText.style.display = "none";
 }
-
-practiceTab.addEventListener("click", showPractice);
-// multiplayerTab click is handled in multiplayer.js (auth check)
 
 // --------------------------------------------------
 // INIT BOARD
@@ -66,7 +65,7 @@ function initBoard() {
 function generateSolvableBoard() {
   let arr;
   do {
-    arr = [1,2,3,4,5,6,7,8,null];
+    arr = [1, 2, 3, 4, 5, 6, 7, 8, null];
     shuffle(arr);
   } while (!isSolvable(arr) || isAlreadySolved(arr));
   return arr;
@@ -123,7 +122,7 @@ function createTiles() {
 // UPDATE TILE POSITIONS (smooth)
 // --------------------------------------------------
 function updateTilePositions() {
-  const tileSize = 110;
+  const tileSize = 135;
   const gap = 10;
 
   const tileElements = document.querySelectorAll(".tile");
