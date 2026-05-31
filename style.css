@@ -1,102 +1,12 @@
-/* GLOBAL DARK BACKGROUND */
+/* GLOBAL */
+* {
+  box-sizing: border-box;
+}
+
 body {
   margin: 0;
   padding: 0;
-  background: #0f0f0f;
-  font-family: Arial, sans-serif;
-  color: white;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-/* MAIN TITLE */
-h1 {
-  margin-top: 20px;
-  font-size: 32px;
-  font-weight: bold;
-  color: white;
-}
-
-/* POPUP BASE */
-.popup {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 300px;
-  padding: 20px;
-  border-radius: 20px;
-  background: rgba(255,255,255,0.1);
-  backdrop-filter: blur(20px);
-  color: white;
-  text-align: center;
-  z-index: 999;
-  display: none;
-}
-
-/* SHOW POPUP */
-.popup:not(.hidden) {
-  display: block;
-}
-
-/* POPUP BUTTONS */
-.popup button {
-  margin-top: 15px;
-  padding: 10px 20px;
-  border: none;
-  border-radius: 12px;
-  background: #0072ff;
-  color: white;
-  font-size: 16px;
-  cursor: pointer;
-}
-
-/* INPUT FIELDS */
-input {
-  width: 90%;
-  padding: 10px;
-  margin-top: 10px;
-  border-radius: 12px;
-  border: none;
-  outline: none;
-  background: rgba(255,255,255,0.15);
-  color: white;
-}
-
-/* BUTTONS */
-button {
-  padding: 12px 20px;
-  margin: 10px;
-  border-radius: 12px;
-  border: none;
-  background: #00c6ff;
-  color: white;
-  font-size: 16px;
-  cursor: pointer;
-}
-
-/* PLAYER LIST BOX */
-#playerListContainer {
-  margin-top: 20px;
-  padding: 15px;
-  width: 300px;
-  border-radius: 20px;
-  background: rgba(255,255,255,0.08);
-  backdrop-filter: blur(15px);
-}
-
-#playerList li {
-  list-style: none;
-  padding: 8px 0;
-  border-bottom: 1px solid rgba(255,255,255,0.2);
-}
-
-/* PAGE LAYOUT */
-body {
-  margin: 0;
-  padding: 0;
-  background: #0f0f0f;
+  background: #05060a;
   font-family: Arial, sans-serif;
   color: white;
   text-align: center;
@@ -108,26 +18,52 @@ body {
 }
 
 #topBar button {
-  margin: 0 10px;
-  padding: 12px 20px;
-  border-radius: 12px;
+  margin: 0 8px;
+  padding: 10px 18px;
+  border-radius: 999px;
   border: none;
-  background: #0072ff;
-  color: white;
-  font-size: 16px;
+  background: #1f2937;
+  color: #e5e7eb;
+  font-size: 15px;
   cursor: pointer;
 }
 
-/* PUZZLE BOARD */
+#topBar button.active {
+  background: #2563eb;
+  color: white;
+}
+
+/* TITLE + MOVES */
+h1 {
+  margin-top: 20px;
+  font-size: 30px;
+}
+
+#moves {
+  margin-top: 8px;
+  font-size: 18px;
+}
+
+/* PANELS */
+#practicePanel,
+#multiplayerPanel {
+  margin-top: 20px;
+}
+
+.hidden {
+  display: none !important;
+}
+
+/* BOARD */
 #board {
   width: 350px;
   height: 350px;
   margin: 20px auto;
   position: relative;
   padding: 0;
-  border-radius: 20px;
-  background: rgba(255,255,255,0.08);
-  backdrop-filter: blur(15px);
+  border-radius: 24px;
+  background: rgba(255,255,255,0.06);
+  backdrop-filter: blur(18px);
   overflow: hidden;
 }
 
@@ -139,34 +75,111 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-  font-size: 48px;
+  font-size: 46px;
   font-weight: bold;
-  border-radius: 18px;
+  border-radius: 20px;
   background: linear-gradient(145deg, #00c6ff, #0072ff);
   color: white;
   transition: top 0.18s ease, left 0.18s ease;
 }
 
-/* POPUP */
+/* BUTTONS */
+button {
+  padding: 10px 18px;
+  margin: 8px;
+  border-radius: 999px;
+  border: none;
+  background: #2563eb;
+  color: white;
+  font-size: 15px;
+  cursor: pointer;
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+/* MULTIPLAYER LAYOUT */
+.mp-row {
+  margin-top: 10px;
+}
+
+#roomInput {
+  padding: 10px;
+  border-radius: 999px;
+  border: none;
+  outline: none;
+  width: 180px;
+  background: rgba(255,255,255,0.12);
+  color: white;
+}
+
+#roomCodeText {
+  margin-top: 10px;
+  font-size: 16px;
+}
+
+/* PLAYER LIST */
+#playerListContainer {
+  margin: 20px auto;
+  padding: 14px;
+  width: 280px;
+  border-radius: 20px;
+  background: rgba(255,255,255,0.06);
+  backdrop-filter: blur(16px);
+}
+
+#playerList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+#playerList li {
+  padding: 6px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.15);
+  font-size: 14px;
+}
+
+/* POPUPS */
 .popup {
   position: fixed;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: 300px;
+  width: 320px;
   padding: 20px;
-  border-radius: 20px;
-  background: rgba(255,255,255,0.1);
+  border-radius: 22px;
+  background: rgba(15,23,42,0.95);
+  color: white;
   backdrop-filter: blur(20px);
+  z-index: 1000;
+}
+
+.popup h2 {
+  margin-top: 0;
+}
+
+.popup-buttons {
+  margin-top: 10px;
+}
+
+.popup input {
+  width: 100%;
+  padding: 9px 12px;
+  margin-top: 8px;
+  border-radius: 999px;
+  border: none;
+  outline: none;
+  background: rgba(255,255,255,0.12);
+  color: white;
+}
+
+/* CONFETTI */
+#confetti {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
   display: none;
 }
-
-.popup:not(.hidden) {
-  display: block;
-}
-
-/* HIDDEN CLASS */
-.hidden {
-  display: none !important;
-}
-
