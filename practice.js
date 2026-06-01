@@ -113,7 +113,7 @@ function createTiles() {
     if (value === null) return;
 
     const tile = document.createElement("div");
-    tile.classList.add("tile8");
+    tile.classList.add("tile");
     tile.textContent = value;
 
     const handle = () => {
@@ -138,7 +138,7 @@ function updateTilePositions() {
   const tileSize = getTileSize();
   const gap = 10;
 
-  document.querySelectorAll(".tile8").forEach(tile => {
+  document.querySelectorAll(".tile").forEach(tile => {
     const value = parseInt(tile.textContent);
     const index = tiles.indexOf(value);
     const row = Math.floor(index / 3);
