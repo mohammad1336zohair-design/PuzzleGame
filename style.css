@@ -2,7 +2,7 @@
   box-sizing: border-box;
 }
 
-/* GLOBAL NEON CYBER THEME */
+/* GLOBAL */
 body {
   margin: 0;
   padding: 0;
@@ -14,49 +14,66 @@ body {
   font-size: 18px;
 }
 
-/* TITLE */
+/* NEON NAVBAR WRAPPER */
+#navWrapper {
+  padding: 12px 16px;
+}
+
+/* NEON NAVBAR (C1, electric blue, inset) */
+#navBar {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 10px 18px;
+  border-radius: 18px;
+  background: linear-gradient(135deg, rgba(0, 40, 120, 0.9), rgba(0, 10, 40, 0.95));
+  box-shadow: 0 0 24px rgba(0, 140, 255, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* NAV TABS */
+#navTabs {
+  display: flex;
+  gap: 18px;
+  margin: 0 auto;
+}
+
+.nav-tab {
+  padding: 10px 22px;
+  font-size: 17px;
+  border-radius: 999px;
+  border: 1px solid rgba(160, 200, 255, 0.6);
+  background: radial-gradient(circle at 30% 30%, #1a3a80, #07132e);
+  color: #cfe3ff;
+  cursor: pointer;
+  box-shadow: 0 0 12px rgba(0, 120, 255, 0.5);
+  transition: 0.18s;
+}
+
+.nav-tab:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 0 18px rgba(0, 150, 255, 0.8);
+}
+
+.nav-tab.active {
+  background: radial-gradient(circle at 30% 30%, #5fb0ff, #0040d0);
+  color: #ffffff;
+  box-shadow: 0 0 22px rgba(0, 170, 255, 0.9);
+}
+
+/* TITLE & MOVES */
 h1 {
   font-size: 42px;
-  margin-top: 25px;
+  margin-top: 18px;
   margin-bottom: 6px;
   color: #6bb6ff;
   text-shadow: 0 0 12px #1e90ff;
 }
 
-/* MOVES */
 #moves {
   font-size: 20px;
   color: #c7ddff;
-}
-
-/* TOP BAR */
-#topBar {
-  margin-top: 24px;
-  margin-bottom: 10px;
-}
-
-#topBar button {
-  margin: 0 8px;
-  padding: 14px 26px;
-  font-size: 18px;
-  border-radius: 14px;
-  background: linear-gradient(135deg, #1e1e2e, #2a2a40);
-  border: 2px solid #3a4fff;
-  color: #bcd4ff;
-  box-shadow: 0 0 12px rgba(0, 102, 255, 0.4);
-  cursor: pointer;
-  transition: 0.2s;
-}
-
-#topBar button.active {
-  background: #004cff;
-  color: white;
-  box-shadow: 0 0 18px #005eff;
-}
-
-#topBar button:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 0 20px #3a6bff;
 }
 
 /* PANELS */
@@ -91,7 +108,7 @@ h1 {
   overflow: hidden;
 }
 
-/* TILES — DESKTOP */
+/* TILES */
 .tile {
   position: absolute;
   width: 130px;
@@ -197,10 +214,6 @@ button:disabled {
   z-index: 9999;
 }
 
-.popup.hidden {
-  display: none !important;
-}
-
 .popup h2 {
   margin-top: 0;
   color: #6bb6ff;
@@ -231,11 +244,9 @@ button:disabled {
   display: none;
 }
 
-/* USER ICON TOP RIGHT (PERSON SILHOUETTE) */
+/* PROFILE ICON + MENU */
 #userIconContainer {
-  position: absolute;
-  top: 20px;
-  right: 20px;
+  position: relative;
 }
 
 #userIcon {
@@ -280,20 +291,42 @@ button:disabled {
 /* DROPDOWN MENU */
 #userMenu {
   position: absolute;
-  top: 50px;
+  top: 52px;
   right: 0;
-  background: rgba(0, 10, 25, 0.95);
+  background: rgba(0, 10, 25, 0.98);
   border: 2px solid #004cff;
-  border-radius: 12px;
-  padding: 10px;
-  width: 120px;
-  box-shadow: 0 0 18px rgba(0, 102, 255, 0.4);
+  border-radius: 14px;
+  padding: 10px 12px;
+  width: 170px;
+  box-shadow: 0 0 18px rgba(0, 102, 255, 0.6);
+  text-align: left;
+  z-index: 1000;
 }
 
+/* CAPSULE USERNAME (C + D) */
+#userNameCapsule {
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(160, 210, 255, 0.9);
+  background: radial-gradient(circle at 30% 30%, rgba(120, 190, 255, 0.25), rgba(0, 40, 120, 0.6));
+  color: #e4f1ff;
+  font-size: 14px;
+  text-align: center;
+  margin-bottom: 8px;
+}
+
+/* DIVIDER */
+.userMenuDivider {
+  height: 1px;
+  background: linear-gradient(to right, transparent, #4fa0ff, transparent);
+  margin-bottom: 8px;
+}
+
+/* LOGOUT BUTTON IN MENU */
 #userMenu button {
   width: 100%;
-  padding: 10px;
-  font-size: 16px;
+  padding: 8px 10px;
+  font-size: 15px;
   border-radius: 10px;
   background: linear-gradient(135deg, #003cff, #005eff);
   border: none;
@@ -305,8 +338,20 @@ button:disabled {
   background: #004cff;
 }
 
-/* MOBILE RESPONSIVE */
+/* MOBILE */
 @media (max-width: 480px) {
+  #navBar {
+    padding: 8px 12px;
+  }
+
+  #navTabs {
+    gap: 10px;
+  }
+
+  .nav-tab {
+    padding: 8px 14px;
+    font-size: 15px;
+  }
 
   #practicePanel,
   #multiplayerPanel {
@@ -323,11 +368,6 @@ button:disabled {
     width: 95px;
     height: 95px;
     font-size: 40px;
-  }
-
-  #userIconContainer {
-    top: 14px;
-    right: 14px;
   }
 
   #userIcon {
