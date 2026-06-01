@@ -245,3 +245,33 @@ button:hover {
     font-size: 40px;
   }
 }
+/* LOGIN SCREEN */
+#loginScreen {
+  margin-top: 40px;
+  padding: 30px;
+  width: 420px;
+  margin-left: auto;
+  margin-right: auto;
+  border-radius: 22px;
+  background: rgba(0, 20, 50, 0.7);
+  box-shadow: 0 0 25px #0099ff;
+  backdrop-filter: blur(20px);
+}
+
+#googleLoginBtn {
+  padding: 14px 26px;
+  font-size: 18px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #004cff, #0077ff);
+  border: none;
+  color: white;
+  box-shadow: 0 0 15px #0066ff;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+#googleLoginBtn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0 22px #0099ff;
+}
+
