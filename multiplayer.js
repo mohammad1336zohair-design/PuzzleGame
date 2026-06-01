@@ -91,11 +91,35 @@ logoutBtn.addEventListener("click", async () => {
 });
 
 /* LOGIN */
+import { signInWithRedirect, getRedirectResult } 
+from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
 async function ensureLoggedIn() {
   if (currentUser) return true;
 
-  try {
-    const result = await signInWithPopup(auth, provider);
+  document.getElementById("loginScreen").classList.remove("hidden");
+  document.getElementById("practicePanel").classList.add("hidden");
+  document.getElementById("multiplayerPanel").classList.add("hidden");
+
+  return false;
+}
+
+document.getElementById("googleLoginBtn").addEventListener("click", () => {
+  signInWithRedirect(auth, provider);
+});
+
+// Handle redirect result
+getRedirectResult(auth).then((result) => {
+  if (result && result.user) {
+    currentUser = result.user;
+    currentUsername = currentUser.email.split("@")[0];
+    userNameCapsule.textContent = currentUsername;
+
+    document.getElementById("loginScreen").classList.add("hidden");
+    window.showMultiplayer();
+  }
+});
+
     currentUser = result.user;
     currentUsername = currentUser.email.split("@")[0];
     userNameCapsule.textContent = currentUsername;
