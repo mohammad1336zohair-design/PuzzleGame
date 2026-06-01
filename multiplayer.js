@@ -33,7 +33,15 @@ import {
 
 /* YOUR CONFIG — paste it here */
 const firebaseConfig = {
-  /* paste your config here */
+  apiKey: "AIzaSyC7J59ExJVU3j9meWZxpopAA0IqutOgX6Q",
+ authDomain: "puzzle-multiplayer-8.firebaseapp.com",
+ databaseURL: "https://puzzle-multiplayer-8-default-rtdb.asia-southeast1.firebasedatabase.app",
+ projectId: "puzzle-multiplayer-8",
+ storageBucket: "puzzle-multiplayer-8.firebasestorage.app",
+ messagingSenderId: "513197674871",
+ appId: "1:513197674871:web:9a6553631d87518e5ad172",
+ measurementId: "G-FZPL8KLPQ7"
+
 };
 
 const app = initializeApp(firebaseConfig);
@@ -121,4 +129,86 @@ async function createRoom() {
     players: [
       {
         uid: currentUser.uid,
-        username: current
+        username: currentUsername,
+        joinedAt: Date.now()
+      }
+    ]
+  });
+
+  currentRoomCode = code;
+  roomCodeText.textContent = `Room code: ${code}`;
+  listenToRoom(code);
+  window.showMultiplayer();
+}
+
+/* JOIN ROOM */
+async function joinRoom() {
+  const ok = await ensureLoggedIn();
+  if (!ok) return;
+
+  const code = roomInput.value.trim().toUpperCase();
+  if (!code) {
+    alert("Enter a room code.");
+    return;
+  }
+
+  const ref = doc(db, "rooms", code);
+  const snap = await getDoc(ref);
+
+  if (!snap.exists()) {
+    alert("Room not found.");
+    return;
+  }
+
+  const data = snap.data();
+  const players = data.players || [];
+
+  if (players.some(p => p.uid === currentUser.uid)) {
+    alert("You are already in this room.");
+    return;
+  }
+
+  await updateDoc(ref, {
+    players: arrayUnion({
+      uid: currentUser.uid,
+      username: currentUsername,
+      joinedAt: Date.now()
+    })
+  });
+
+  currentRoomCode = code;
+  roomCodeText.textContent = `Room code: ${code}`;
+  listenToRoom(code);
+  window.showMultiplayer();
+}
+
+/* LISTEN TO ROOM */
+function listenToRoom(code) {
+  if (roomUnsub) roomUnsub();
+
+  const ref = doc(db, "rooms", code);
+  roomUnsub = onSnapshot(ref, (snap) => {
+    if (!snap.exists()) {
+      playerList.innerHTML = "";
+      roomCodeText.textContent = "Room closed.";
+      return;
+    }
+
+    const data = snap.data();
+    renderPlayers(data.players || []);
+  });
+}
+
+/* RENDER PLAYERS */
+function renderPlayers(players) {
+  playerList.innerHTML = "";
+  players.forEach(p => {
+    const li = document.createElement("li");
+    li.textContent = p.username;
+    playerList.appendChild(li);
+  });
+}
+
+/* BUTTON EVENTS */
+createRoomBtn.addEventListener("click", createRoom);
+joinRoomBtn.addEventListener("click", joinRoom);
