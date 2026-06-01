@@ -120,15 +120,6 @@ getRedirectResult(auth).then((result) => {
   }
 });
 
-    currentUser = result.user;
-    currentUsername = currentUser.email.split("@")[0];
-    userNameCapsule.textContent = currentUsername;
-    return true;
-  } catch {
-    alert("Login cancelled.");
-    return false;
-  }
-}
 
 /* ROOM CODE GENERATOR */
 function generateRoomCode() {
