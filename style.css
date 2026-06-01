@@ -13,6 +13,54 @@ body {
   letter-spacing: 0.5px;
   font-size: 18px;
 }
+/* USER ICON TOP RIGHT */
+#userIconContainer {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+}
+
+#userIcon {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #6bb6ff, #004cff);
+  border: 2px solid #ffffff55;
+  box-shadow: 0 0 12px rgba(0, 102, 255, 0.6);
+  cursor: pointer;
+}
+
+/* DROPDOWN MENU */
+#userMenu {
+  position: absolute;
+  top: 50px;
+  right: 0;
+  background: rgba(0, 10, 25, 0.95);
+  border: 2px solid #004cff;
+  border-radius: 12px;
+  padding: 10px;
+  width: 120px;
+  box-shadow: 0 0 18px rgba(0, 102, 255, 0.4);
+}
+
+#userMenu button {
+  width: 100%;
+  padding: 10px;
+  font-size: 16px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #003cff, #005eff);
+  border: none;
+  color: white;
+  cursor: pointer;
+}
+
+#userMenu button:hover {
+  background: #004cff;
+}
+
+.hidden {
+  display: none !important;
+}
 
 /* TITLE */
 h1 {
