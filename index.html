@@ -1,91 +1,71 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>8 Puzzle Game</title>
-  <link rel="stylesheet" href="style.css?v=3">
+  <meta charset="UTF-8" />
+  <title>8‑Puzzler</title>
+  <link rel="stylesheet" href="style.css?v=7" />
 </head>
 <body>
-<div id="userIconContainer">
-  <div id="userIcon"></div>
+  <!-- NEON NAVBAR -->
+  <header id="navWrapper">
+    <div id="navBar">
+      <div id="navTabs">
+        <button id="practiceTab" class="nav-tab active">Practice</button>
+        <button id="multiplayerTab" class="nav-tab">Multiplayer</button>
+      </div>
 
-  <div id="userMenu" class="hidden">
-    <button id="logoutBtn">Log Out</button>
-  </div>
-</div>
-
-  <div id="topBar">
-    <button id="practiceTab" class="active">Practice</button>
-    <button id="multiplayerTab">Multiplayer</button>
-  </div>
-
-  <h1>8 Puzzle Game</h1>
-  <div id="moves">Moves: 0</div>
-
-  <!-- PRACTICE PANEL -->
-  <div id="practicePanel">
-    <div id="board"></div>
-    <button id="restartBtn" class="hidden">Restart</button>
-  </div>
-
-  <!-- MULTIPLAYER PANEL -->
-  <div id="multiplayerPanel" class="hidden">
-    <div class="mp-row">
-      <button id="createRoomBtn">Create Room</button>
+      <div id="userIconContainer">
+        <div id="userIcon"></div>
+        <div id="userMenu" class="hidden">
+          <div id="userNameCapsule">Username</div>
+          <div class="userMenuDivider"></div>
+          <button id="logoutBtn">Log Out</button>
+        </div>
+      </div>
     </div>
+  </header>
 
-    <div class="mp-row">
-      <input id="roomInput" placeholder="Enter Room Code">
-      <button id="joinRoomBtn">Join Room</button>
-    </div>
+  <main>
+    <h1>8‑Puzzler</h1>
+    <div id="moves">Moves: 0</div>
 
-    <div class="mp-row">
-      <button id="startMatchBtn" class="hidden">Start Match</button>
-      <button id="leaveMatchBtn" class="hidden">Leave Match</button>
-    </div>
+    <!-- PRACTICE PANEL -->
+    <section id="practicePanel">
+      <div id="board"></div>
+      <button id="restartBtn" class="hidden">Restart</button>
+    </section>
 
-    <div id="roomCodeText"></div>
+    <!-- MULTIPLAYER PANEL -->
+    <section id="multiplayerPanel" class="hidden">
+      <div class="mp-row">
+        <button id="createRoomBtn">Create Room</button>
+      </div>
+      <div class="mp-row">
+        <input id="roomInput" placeholder="Enter room code" />
+        <button id="joinRoomBtn">Join Room</button>
+      </div>
+      <div class="mp-row" id="roomCodeText"></div>
 
-    <div id="playerListContainer" class="hidden">
-      <h3>Players</h3>
-      <ul id="playerList"></ul>
-    </div>
-  </div>
-
-  <!-- LOGIN POPUP -->
-  <div id="loginPopup" class="popup hidden">
-    <h2>Login / Sign Up</h2>
-    <input id="email" type="email" placeholder="Email">
-    <input id="password" type="password" placeholder="Password">
-    <input id="username" type="text" placeholder="Username (for Sign Up)">
-    <div class="popup-buttons">
-      <button id="signupBtn">Sign Up</button>
-      <button id="loginBtn">Login</button>
-    </div>
-    <button id="closeLogin">Close</button>
-  </div>
-
-  <!-- LEAVE MATCH POPUP -->
-  <div id="leavePopup" class="popup hidden">
-    <h2>Leave Match?</h2>
-    <p>Are you sure you want to leave?</p>
-    <div class="popup-buttons">
-      <button id="leaveYes">Leave</button>
-      <button id="leaveNo">Stay</button>
-    </div>
-  </div>
+      <div id="playerListContainer">
+        <h3>Players</h3>
+        <ul id="playerList"></ul>
+      </div>
+    </section>
+  </main>
 
   <!-- WIN POPUP -->
   <div id="winPopup" class="popup hidden">
-    <h2>You Win!</h2>
+    <h2>Nice!</h2>
     <p id="moveCountText"></p>
-    <button id="closePopup">Close</button>
+    <div class="popup-buttons">
+      <button id="closePopup">Close</button>
+    </div>
   </div>
 
   <!-- CONFETTI -->
   <canvas id="confetti"></canvas>
 
-  <script src="practice.js?v=3" type="module"></script>
-  <script src="multiplayer.js?v=3" type="module"></script>
+  <script type="module" src="practice.js?v=7"></script>
+  <script type="module" src="multiplayer.js?v=7"></script>
 </body>
 </html>
