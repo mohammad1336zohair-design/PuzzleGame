@@ -13,54 +13,6 @@ body {
   letter-spacing: 0.5px;
   font-size: 18px;
 }
-/* USER ICON TOP RIGHT */
-#userIconContainer {
-  position: absolute;
-  top: 20px;
-  right: 20px;
-}
-
-#userIcon {
-  width: 42px;
-  height: 42px;
-  border-radius: 50%;
-  background: radial-gradient(circle, #6bb6ff, #004cff);
-  border: 2px solid #ffffff55;
-  box-shadow: 0 0 12px rgba(0, 102, 255, 0.6);
-  cursor: pointer;
-}
-
-/* DROPDOWN MENU */
-#userMenu {
-  position: absolute;
-  top: 50px;
-  right: 0;
-  background: rgba(0, 10, 25, 0.95);
-  border: 2px solid #004cff;
-  border-radius: 12px;
-  padding: 10px;
-  width: 120px;
-  box-shadow: 0 0 18px rgba(0, 102, 255, 0.4);
-}
-
-#userMenu button {
-  width: 100%;
-  padding: 10px;
-  font-size: 16px;
-  border-radius: 10px;
-  background: linear-gradient(135deg, #003cff, #005eff);
-  border: none;
-  color: white;
-  cursor: pointer;
-}
-
-#userMenu button:hover {
-  background: #004cff;
-}
-
-.hidden {
-  display: none !important;
-}
 
 /* TITLE */
 h1 {
@@ -139,7 +91,7 @@ h1 {
   overflow: hidden;
 }
 
-/* TILES — FINAL DESKTOP SIZE */
+/* TILES — DESKTOP */
 .tile {
   position: absolute;
   width: 130px;
@@ -279,7 +231,81 @@ button:disabled {
   display: none;
 }
 
-/* MOBILE RESPONSIVE — FINAL */
+/* USER ICON TOP RIGHT (PERSON SILHOUETTE) */
+#userIconContainer {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+}
+
+#userIcon {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, #6bb6ff, #0040d0);
+  border: 2px solid #ffffff55;
+  box-shadow: 0 0 12px rgba(0, 102, 255, 0.6);
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+
+/* head */
+#userIcon::before {
+  content: "";
+  position: absolute;
+  top: 9px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 2px solid #ffffff;
+}
+
+/* shoulders/body */
+#userIcon::after {
+  content: "";
+  position: absolute;
+  bottom: 7px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 22px;
+  height: 14px;
+  border-radius: 999px 999px 4px 4px;
+  border: 2px solid #ffffff;
+  border-top: 0;
+}
+
+/* DROPDOWN MENU */
+#userMenu {
+  position: absolute;
+  top: 50px;
+  right: 0;
+  background: rgba(0, 10, 25, 0.95);
+  border: 2px solid #004cff;
+  border-radius: 12px;
+  padding: 10px;
+  width: 120px;
+  box-shadow: 0 0 18px rgba(0, 102, 255, 0.4);
+}
+
+#userMenu button {
+  width: 100%;
+  padding: 10px;
+  font-size: 16px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #003cff, #005eff);
+  border: none;
+  color: white;
+  cursor: pointer;
+}
+
+#userMenu button:hover {
+  background: #004cff;
+}
+
+/* MOBILE RESPONSIVE */
 @media (max-width: 480px) {
 
   #practicePanel,
@@ -297,5 +323,15 @@ button:disabled {
     width: 95px;
     height: 95px;
     font-size: 40px;
+  }
+
+  #userIconContainer {
+    top: 14px;
+    right: 14px;
+  }
+
+  #userIcon {
+    width: 36px;
+    height: 36px;
   }
 }
