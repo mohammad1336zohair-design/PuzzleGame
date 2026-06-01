@@ -205,7 +205,14 @@ closePopup.addEventListener("click", () => {
   stopConfetti();
 });
 practiceTab.addEventListener("click", showPractice);
-multiplayerTab.addEventListener("click", showMultiplayer);
+multiplayerTab.addEventListener("click", () => {
+  if (!currentUser) {
+    document.getElementById("loginScreen").classList.remove("hidden");
+    return;
+  }
+  showMultiplayer();
+});
+
 
 window.addEventListener("resize", () => {
   if (confettiCanvas.style.display === "block") resizeConfettiCanvas();
