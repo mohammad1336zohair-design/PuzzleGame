@@ -1,29 +1,29 @@
+/* ========== GLOBAL RESET ========== */
 * {
   box-sizing: border-box;
 }
 
-/* GLOBAL */
 body {
   margin: 0;
   padding: 0;
-  background: radial-gradient(circle at top, #0a0f1f, #000000 70%);
+  background: radial-gradient(circle at top, #001028, #000000 70%);
   font-family: 'Segoe UI', sans-serif;
   color: #e0eaff;
   text-align: center;
 }
 
-/* NAVBAR WRAPPER */
+/* ========== NAVBAR WRAPPER ========== */
 #navWrapper {
   width: 100%;
   padding: 0;
 }
 
-/* NAVBAR */
+/* ========== NAVBAR ========== */
 #navBar {
   width: 100%;
   padding: 12px 20px;
-  background: linear-gradient(135deg, rgba(0, 40, 120, 0.95), rgba(0, 10, 40, 0.98));
-  box-shadow: 0 0 24px rgba(0, 140, 255, 0.7);
+  background: linear-gradient(135deg, #003cff, #001a66);
+  box-shadow: 0 0 25px #008cff;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -38,20 +38,127 @@ body {
 .nav-tab {
   padding: 10px 22px;
   border-radius: 999px;
-  border: 1px solid rgba(160, 200, 255, 0.6);
-  background: radial-gradient(circle at 30% 30%, #1a3a80, #07132e);
-  color: #cfe3ff;
+  border: 1px solid #7fc2ff;
+  background: radial-gradient(circle at 30% 30%, #0040ff, #001a66);
+  color: #d8e8ff;
   cursor: pointer;
   transition: 0.18s;
+  box-shadow: 0 0 12px #007bff;
 }
 
 .nav-tab.active {
-  background: radial-gradient(circle at 30% 30%, #5fb0ff, #0040d0);
+  background: radial-gradient(circle at 30% 30%, #5fb0ff, #0040ff);
   color: white;
-  box-shadow: 0 0 22px rgba(0, 170, 255, 0.9);
+  box-shadow: 0 0 22px #00aaff;
+}
+/* ========== PANELS ========== */
+#practicePanel,
+#multiplayerPanel {
+  margin-top: 24px;
+  padding: 25px;
+  width: 520px;
+  margin-left: auto;
+  margin-right: auto;
+  border-radius: 22px;
+  background: rgba(0, 20, 40, 0.55);
+  backdrop-filter: blur(20px);
+  box-shadow: 0 0 25px rgba(0, 102, 255, 0.25);
 }
 
-/* PROFILE ICON */
+.hidden {
+  display: none !important;
+}
+
+/* ========== BOARD ========== */
+#board {
+  width: 420px;
+  height: 420px;
+  margin: 25px auto;
+  position: relative;
+  border-radius: 22px;
+  background: rgba(0, 0, 0, 0.35);
+  border: 2px solid #0066ff;
+  box-shadow: 0 0 25px #0066ff;
+  overflow: hidden;
+}
+
+/* ========== TILES ========== */
+.tile {
+  position: absolute;
+  width: 130px;
+  height: 130px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 54px;
+  font-weight: bold;
+  border-radius: 18px;
+  background: linear-gradient(135deg, #008cff, #00c6ff);
+  color: white;
+  box-shadow: 0 0 18px #00aaff;
+  transition: top 0.18s ease, left 0.18s ease, transform 0.15s;
+}
+
+.tile:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 25px #00cfff;
+}
+
+/* ========== BUTTONS ========== */
+button {
+  padding: 14px 26px;
+  font-size: 18px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #004cff, #0077ff);
+  border: none;
+  color: white;
+  box-shadow: 0 0 15px #0066ff;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0 22px #0099ff;
+}
+/* ========== WIN POPUP (BRIGHT NEON BLUE) ========== */
+.popup {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 380px;
+  padding: 30px;
+  border-radius: 24px;
+
+  background: linear-gradient(135deg, #0066ff, #0033cc);
+  border: 3px solid #66b3ff;
+  box-shadow: 0 0 35px #0099ff, 0 0 60px #00ccff;
+
+  z-index: 9999;
+  color: white;
+  text-shadow: 0 0 8px #0033ff;
+}
+
+.popup h2 {
+  margin-top: 0;
+  font-size: 32px;
+  color: #e6f3ff;
+}
+
+.popup-buttons {
+  margin-top: 12px;
+}
+
+/* ========== CONFETTI ========== */
+#confetti {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  display: none;
+  z-index: 9998;
+}
+/* ========== PROFILE ICON ========== */
 #userIconContainer {
   position: relative;
   z-index: 9999;
@@ -61,7 +168,7 @@ body {
   width: 42px;
   height: 42px;
   border-radius: 50%;
-  background: radial-gradient(circle at 30% 30%, #6bb6ff, #0040d0);
+  background: radial-gradient(circle at 30% 30%, #66b3ff, #0040d0);
   border: 2px solid #ffffff55;
   cursor: pointer;
   position: relative;
@@ -77,7 +184,7 @@ body {
   width: 14px;
   height: 14px;
   border-radius: 50%;
-  border: 2px solid #ffffff;
+  border: 2px solid white;
 }
 
 /* BODY */
@@ -90,7 +197,7 @@ body {
   width: 22px;
   height: 14px;
   border-radius: 999px 999px 4px 4px;
-  border: 2px solid #ffffff;
+  border: 2px solid white;
   border-top: 0;
 }
 
@@ -99,107 +206,42 @@ body {
   position: absolute;
   top: 52px;
   right: 0;
-  background: rgba(0, 10, 25, 0.98);
-  border: 2px solid #004cff;
+  background: rgba(0, 20, 50, 0.98);
+  border: 2px solid #0099ff;
   border-radius: 14px;
   padding: 10px 12px;
   width: 170px;
-  box-shadow: 0 0 18px rgba(0, 102, 255, 0.6);
+  box-shadow: 0 0 18px #00aaff;
+  z-index: 10000;
 }
 
-.hidden {
-  display: none !important;
-}
-
-/* CAPSULE */
 #userNameCapsule {
   padding: 6px 10px;
   border-radius: 999px;
-  border: 1px solid rgba(160, 210, 255, 0.9);
-  background: radial-gradient(circle at 30% 30%, rgba(120, 190, 255, 0.25), rgba(0, 40, 120, 0.6));
+  border: 1px solid #66c2ff;
+  background: radial-gradient(circle at 30% 30%, #0040ff55, #002266aa);
   color: #e4f1ff;
   font-size: 14px;
   text-align: center;
   margin-bottom: 8px;
 }
 
-/* DIVIDER */
 .userMenuDivider {
   height: 1px;
   background: linear-gradient(to right, transparent, #4fa0ff, transparent);
   margin-bottom: 8px;
 }
 
-/* LOGOUT BUTTON */
-#userMenu button {
-  width: 100%;
-  padding: 8px 10px;
-  border-radius: 10px;
-  background: linear-gradient(135deg, #003cff, #005eff);
-  border: none;
-  color: white;
-  cursor: pointer;
-}
+/* MOBILE */
+@media (max-width: 480px) {
+  #board {
+    width: 300px;
+    height: 300px;
+  }
 
-/* PANELS */
-#practicePanel,
-#multiplayerPanel {
-  margin-top: 24px;
-  padding: 25px;
-  width: 520px;
-  margin-left: auto;
-  margin-right: auto;
-  border-radius: 22px;
-  background: rgba(0, 20, 40, 0.55);
-  backdrop-filter: blur(20px);
-}
-
-/* BOARD */
-#board {
-  width: 420px;
-  height: 420px;
-  margin: 25px auto;
-  position: relative;
-  border-radius: 22px;
-  background: rgba(0, 0, 0, 0.35);
-  border: 2px solid #004cff;
-  overflow: hidden;
-}
-
-/* TILE */
-.tile {
-  position: absolute;
-  width: 130px;
-  height: 130px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-size: 54px;
-  font-weight: bold;
-  border-radius: 18px;
-  background: linear-gradient(135deg, #0072ff, #00c6ff);
-  color: white;
-  transition: 0.18s;
-}
-
-/* POPUP */
-.popup {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 380px;
-  padding: 30px;
-  border-radius: 24px;
-  background: rgba(0, 10, 25, 0.95);
-  border: 2px solid #004cff;
-  z-index: 9999;
-}
-
-/* CONFETTI */
-#confetti {
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  display: none;
+  .tile {
+    width: 95px;
+    height: 95px;
+    font-size: 40px;
+  }
 }
