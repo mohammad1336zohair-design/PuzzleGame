@@ -345,3 +345,25 @@ leaveYes.addEventListener("click", async () => {
   hideRoomUI();
   showPractice();
 });
+
+// USER ICON MENU
+const userIcon = document.getElementById("userIcon");
+const userMenu = document.getElementById("userMenu");
+const logoutBtn = document.getElementById("logoutBtn");
+
+// Toggle menu
+userIcon.addEventListener("click", () => {
+  userMenu.classList.toggle("hidden");
+});
+
+// Logout
+logoutBtn.addEventListener("click", async () => {
+  userMenu.classList.add("hidden");
+
+  if (currentUser) {
+    await auth.signOut();
+  }
+
+  alert("You have been logged out.");
+  showPractice();
+});
