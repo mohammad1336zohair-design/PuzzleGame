@@ -12,9 +12,14 @@ const multiplayerPanel = document.getElementById("multiplayerPanel");
 const practiceTab = document.getElementById("practiceTab");
 const multiplayerTab = document.getElementById("multiplayerTab");
 
+const confettiCanvas = document.getElementById("confetti");
+const confettiCtx = confettiCanvas.getContext("2d");
+
 let tiles = [];
 let emptyIndex = 8;
 let moves = 0;
+let confettiPieces = [];
+let confettiAnimationId = null;
 
 /* NAVIGATION */
 function showPractice() {
@@ -47,6 +52,7 @@ function initBoard() {
   movesText.textContent = "Moves: 0";
   winPopup.classList.add("hidden");
   restartBtn.classList.add("hidden");
+  stopConfetti();
 }
 
 /* GENERATE SOLVABLE BOARD */
@@ -143,13 +149,69 @@ function onWin() {
   moveCountText.textContent = `You solved it in ${moves} moves!`;
   winPopup.classList.remove("hidden");
   restartBtn.classList.remove("hidden");
+  startConfetti();
+}
+
+/* CONFETTI */
+function resizeConfettiCanvas() {
+  confettiCanvas.width = window.innerWidth;
+  confettiCanvas.height = window.innerHeight;
+}
+
+function createConfetti() {
+  confettiPieces = [];
+  for (let i = 0; i < 150; i++) {
+    confettiPieces.push({
+      x: Math.random() * confettiCanvas.width,
+      y: Math.random() * confettiCanvas.height - confettiCanvas.height,
+      size: 5 + Math.random() * 5,
+      speedY: 2 + Math.random() * 3,
+      color: `hsl(${Math.random() * 360}, 80%, 60%)`
+    });
+  }
+}
+
+function drawConfetti() {
+  confettiCtx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
+  confettiPieces.forEach(p => {
+    confettiCtx.fillStyle = p.color;
+    confettiCtx.fillRect(p.x, p.y, p.size, p.size);
+    p.y += p.speedY;
+    if (p.y > confettiCanvas.height) {
+      p.y = -10;
+      p.x = Math.random() * confettiCanvas.width;
+    }
+  });
+  confettiAnimationId = requestAnimationFrame(drawConfetti);
+}
+
+function startConfetti() {
+  resizeConfettiCanvas();
+  createConfetti();
+  confettiCanvas.style.display = "block";
+  drawConfetti();
+}
+
+function stopConfetti() {
+  if (confettiAnimationId) cancelAnimationFrame(confettiAnimationId);
+  confettiCanvas.style.display = "none";
+  confettiCtx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
 }
 
 /* EVENTS */
 restartBtn.addEventListener("click", initBoard);
-closePopup.addEventListener("click", () => winPopup.classList.add("hidden"));
+closePopup.addEventListener("click", () => {
+  winPopup.classList.add("hidden");
+  stopConfetti();
+});
 practiceTab.addEventListener("click", showPractice);
 multiplayerTab.addEventListener("click", showMultiplayer);
 
+window.addEventListener("resize", () => {
+  if (confettiCanvas.style.display === "block") resizeConfettiCanvas();
+  updateTilePositions();
+});
+
+/* INIT */
 initBoard();
 showPractice();
