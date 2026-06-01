@@ -1,8 +1,6 @@
 // MULTIPLAYER + AUTH + PROFILE MENU
 
-import { showPractice, showMultiplayer } from "./practice.js";
-
-// DOM
+/* DOM */
 const createRoomBtn = document.getElementById("createRoomBtn");
 const joinRoomBtn = document.getElementById("joinRoomBtn");
 const roomInput = document.getElementById("roomInput");
@@ -14,7 +12,7 @@ const userMenu = document.getElementById("userMenu");
 const logoutBtn = document.getElementById("logoutBtn");
 const userNameCapsule = document.getElementById("userNameCapsule");
 
-// FIREBASE (fill in your config)
+/* FIREBASE IMPORTS */
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import {
   getAuth,
@@ -33,8 +31,9 @@ import {
   arrayUnion
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
+/* YOUR CONFIG — paste it here */
 const firebaseConfig = {
-  // TODO: put your config here
+  /* paste your config here */
 };
 
 const app = initializeApp(firebaseConfig);
@@ -42,72 +41,64 @@ const auth = getAuth(app);
 const db = getFirestore(app);
 const provider = new GoogleAuthProvider();
 
-// STATE
+/* STATE */
 let currentUser = null;
-let currentUsername = null;
+let currentUsername = "Guest";
 let currentRoomCode = null;
-let isHost = false;
 let roomUnsub = null;
 
-// AUTH STATE
-onAuthStateChanged(auth, async (user) => {
+/* AUTH STATE */
+onAuthStateChanged(auth, (user) => {
   currentUser = user || null;
 
   if (!user) {
-    currentUsername = null;
+    currentUsername = "Guest";
     userNameCapsule.textContent = "Guest";
-    showPractice();
+    window.showPractice();
     return;
   }
 
-  // Derive username from email before @
   const email = user.email || "";
-  const baseName = email.split("@")[0] || "Player";
-  currentUsername = baseName;
+  currentUsername = email.split("@")[0] || "Player";
   userNameCapsule.textContent = currentUsername;
 });
 
-// PROFILE MENU
-userIcon.addEventListener("click", () => {
+/* PROFILE MENU */
+userIcon.addEventListener("click", (e) => {
+  e.stopPropagation();
   userMenu.classList.toggle("hidden");
 });
 
 document.addEventListener("click", (e) => {
-  if (!userMenu.classList.contains("hidden")) {
-    if (!userMenu.contains(e.target) && !userIcon.contains(e.target)) {
-      userMenu.classList.add("hidden");
-    }
+  if (!userMenu.contains(e.target) && !userIcon.contains(e.target)) {
+    userMenu.classList.add("hidden");
   }
 });
 
-// LOGOUT
+/* LOGOUT */
 logoutBtn.addEventListener("click", async () => {
   userMenu.classList.add("hidden");
-  if (currentUser) {
-    await signOut(auth);
-  }
-  alert("You have been logged out.");
-  showPractice();
+  if (currentUser) await signOut(auth);
+  alert("Logged out.");
+  window.showPractice();
 });
 
-// LOGIN HELPER
+/* LOGIN */
 async function ensureLoggedIn() {
   if (currentUser) return true;
   try {
     const result = await signInWithPopup(auth, provider);
     currentUser = result.user;
-    const email = currentUser.email || "";
-    currentUsername = (email.split("@")[0] || "Player");
+    currentUsername = currentUser.email.split("@")[0];
     userNameCapsule.textContent = currentUsername;
     return true;
-  } catch (e) {
-    console.error(e);
+  } catch {
     alert("Login cancelled.");
     return false;
   }
 }
 
-// ROOM HELPERS
+/* ROOM CODE */
 function generateRoomCode() {
   const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
   let code = "";
@@ -117,107 +108,17 @@ function generateRoomCode() {
   return code;
 }
 
+/* CREATE ROOM */
 async function createRoom() {
   const ok = await ensureLoggedIn();
   if (!ok) return;
 
   const code = generateRoomCode();
-  const roomRef = doc(db, "rooms", code);
+  const ref = doc(db, "rooms", code);
 
-  await setDoc(roomRef, {
+  await setDoc(ref, {
     hostUid: currentUser.uid,
-    createdAt: Date.now(),
     players: [
       {
         uid: currentUser.uid,
-        username: currentUsername,
-        joinedAt: Date.now()
-      }
-    ]
-  });
-
-  isHost = true;
-  currentRoomCode = code;
-  roomCodeText.textContent = `Room code: ${code}`;
-  listenToRoom(code);
-  showMultiplayer();
-}
-
-async function joinRoom() {
-  const ok = await ensureLoggedIn();
-  if (!ok) return;
-
-  const code = roomInput.value.trim().toUpperCase();
-  if (!code) {
-    alert("Enter a room code.");
-    return;
-  }
-
-  const roomRef = doc(db, "rooms", code);
-  const snap = await getDoc(roomRef);
-  if (!snap.exists()) {
-    alert("Room not found.");
-    return;
-  }
-
-  const data = snap.data();
-  const players = data.players || [];
-
-  // PREVENT HOST OR SAME USER FROM REJOINING
-  const alreadyIn = players.some(p => p.uid === currentUser.uid);
-  if (alreadyIn) {
-    alert("You are already in this room.");
-    return;
-  }
-
-  await updateDoc(roomRef, {
-    players: arrayUnion({
-      uid: currentUser.uid,
-      username: currentUsername,
-      joinedAt: Date.now()
-    })
-  });
-
-  isHost = (data.hostUid === currentUser.uid);
-  currentRoomCode = code;
-  roomCodeText.textContent = `Room code: ${code}`;
-  listenToRoom(code);
-  showMultiplayer();
-}
-
-function listenToRoom(code) {
-  if (roomUnsub) {
-    roomUnsub();
-    roomUnsub = null;
-  }
-
-  const roomRef = doc(db, "rooms", code);
-  roomUnsub = onSnapshot(roomRef, (snap) => {
-    if (!snap.exists()) {
-      playerList.innerHTML = "";
-      roomCodeText.textContent = "Room closed.";
-      return;
-    }
-    const data = snap.data();
-    const players = data.players || [];
-    renderPlayers(players);
-  });
-}
-
-function renderPlayers(players) {
-  playerList.innerHTML = "";
-  players.forEach(p => {
-    const li = document.createElement("li");
-    li.textContent = p.username || "Player";
-    playerList.appendChild(li);
-  });
-}
-
-// BUTTON EVENTS
-createRoomBtn.addEventListener("click", () => {
-  createRoom();
-});
-
-joinRoomBtn.addEventListener("click", () => {
-  joinRoom();
-});
+        username: current
