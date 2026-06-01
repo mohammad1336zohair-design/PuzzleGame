@@ -6,9 +6,6 @@ import { showPractice, showMultiplayer } from "./practice.js";
 const practiceTab = document.getElementById("practiceTab");
 const multiplayerTab = document.getElementById("multiplayerTab");
 
-const practicePanel = document.getElementById("practicePanel");
-const multiplayerPanel = document.getElementById("multiplayerPanel");
-
 const createRoomBtn = document.getElementById("createRoomBtn");
 const joinRoomBtn = document.getElementById("joinRoomBtn");
 const roomInput = document.getElementById("roomInput");
