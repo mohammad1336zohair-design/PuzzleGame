@@ -31,7 +31,7 @@ import {
   arrayUnion
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-/* YOUR CONFIG — paste it here */
+/* YOUR FIREBASE CONFIG — INSTALLED */
 const firebaseConfig = {
   apiKey: "AIzaSyC7J59ExJVU3j9meWZxpopAA0IqutOgX6Q",
   authDomain: "puzzle-multiplayer-8.firebaseapp.com",
@@ -54,7 +54,7 @@ let currentUsername = "Guest";
 let currentRoomCode = null;
 let roomUnsub = null;
 
-/* AUTH STATE */
+/* AUTH STATE LISTENER */
 onAuthStateChanged(auth, (user) => {
   currentUser = user || null;
 
@@ -93,6 +93,7 @@ logoutBtn.addEventListener("click", async () => {
 /* LOGIN */
 async function ensureLoggedIn() {
   if (currentUser) return true;
+
   try {
     const result = await signInWithPopup(auth, provider);
     currentUser = result.user;
@@ -105,7 +106,7 @@ async function ensureLoggedIn() {
   }
 }
 
-/* ROOM CODE */
+/* ROOM CODE GENERATOR */
 function generateRoomCode() {
   const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
   let code = "";
