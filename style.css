@@ -91,7 +91,7 @@ h1 {
   overflow: hidden;
 }
 
-/* TILES */
+/* TILES — FINAL DESKTOP SIZE */
 .tile {
   position: absolute;
   width: 130px;
@@ -231,7 +231,7 @@ button:disabled {
   display: none;
 }
 
-/* MOBILE RESPONSIVE */
+/* MOBILE RESPONSIVE — FINAL */
 @media (max-width: 480px) {
 
   #practicePanel,
