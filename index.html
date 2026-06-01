@@ -3,9 +3,20 @@
 <head>
   <meta charset="UTF-8" />
   <title>8‑Puzzler</title>
-  <link rel="stylesheet" href="style.css?v=9" />
+  <link rel="stylesheet" href="style.css?v=10" />
 </head>
 <body>
+
+  <!-- FULLSCREEN LOGIN -->
+  <div id="loginOverlay" class="hidden">
+    <div id="loginBox">
+      <h1>Welcome</h1>
+      <p>Sign in to access Multiplayer</p>
+
+      <button id="googleLoginBtn">Sign in with Google</button>
+      <button id="cancelLoginBtn" class="cancel-btn">Nevermind</button>
+    </div>
+  </div>
 
   <!-- NAVBAR -->
   <header id="navWrapper">
@@ -15,7 +26,7 @@
         <button id="multiplayerTab" class="nav-tab">Multiplayer</button>
       </div>
 
-      <div id="userIconContainer">
+      <div id="userIconContainer" class="hidden">
         <div id="userIcon"></div>
         <div id="userMenu" class="hidden">
           <div id="userNameCapsule">Guest</div>
@@ -29,20 +40,6 @@
   <main>
     <h1>8‑Puzzler</h1>
     <div id="moves">Moves: 0</div>
-
-    <!-- LOGIN SCREEN -->
-<div id="loginScreen" class="hidden">
-  <h2>Sign In</h2>
-  <p>Log in to access Multiplayer</p>
-  <button id="googleLoginBtn">Sign in with Google</button>
-</div>
-
-<!-- LOGIN SCREEN (CENTERED) -->
-<div id="loginScreen" class="login-center hidden">
-  <h2>Sign In</h2>
-  <p>Log in to access Multiplayer</p>
-  <button id="googleLoginBtn">Sign in with Google</button>
-</div>
 
     <!-- PRACTICE -->
     <section id="practicePanel">
@@ -83,8 +80,8 @@
   <canvas id="confetti"></canvas>
 
   <!-- SCRIPTS -->
-  <script type="module" src="practice.js?v=9"></script>
-  <script type="module" src="multiplayer.js?v=9"></script>
+  <script type="module" src="practice.js?v=10"></script>
+  <script type="module" src="multiplayer.js?v=10"></script>
 
 </body>
 </html>
