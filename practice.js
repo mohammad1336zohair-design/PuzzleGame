@@ -206,13 +206,12 @@ closePopup.addEventListener("click", () => {
 });
 practiceTab.addEventListener("click", showPractice);
 multiplayerTab.addEventListener("click", () => {
-  if (!currentUser) {
+  if (!window.currentUser) {
     document.getElementById("loginScreen").classList.remove("hidden");
     return;
   }
   showMultiplayer();
 });
-
 
 window.addEventListener("resize", () => {
   if (confettiCanvas.style.display === "block") resizeConfettiCanvas();
