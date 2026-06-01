@@ -1,174 +1,113 @@
+// MULTIPLAYER + AUTH + PROFILE MENU
+
 import { showPractice, showMultiplayer } from "./practice.js";
 
-// --------------------------------------------------
-// DOM ELEMENTS
-// --------------------------------------------------
-const practiceTab = document.getElementById("practiceTab");
-const multiplayerTab = document.getElementById("multiplayerTab");
-
+// DOM
 const createRoomBtn = document.getElementById("createRoomBtn");
 const joinRoomBtn = document.getElementById("joinRoomBtn");
 const roomInput = document.getElementById("roomInput");
 const roomCodeText = document.getElementById("roomCodeText");
-
-const playerListContainer = document.getElementById("playerListContainer");
 const playerList = document.getElementById("playerList");
 
-const startMatchBtn = document.getElementById("startMatchBtn");
-const leaveMatchBtn = document.getElementById("leaveMatchBtn");
+const userIcon = document.getElementById("userIcon");
+const userMenu = document.getElementById("userMenu");
+const logoutBtn = document.getElementById("logoutBtn");
+const userNameCapsule = document.getElementById("userNameCapsule");
 
-const loginPopup = document.getElementById("loginPopup");
-const emailInput = document.getElementById("email");
-const passwordInput = document.getElementById("password");
-const usernameInput = document.getElementById("username");
-const signupBtn = document.getElementById("signupBtn");
-const loginBtn = document.getElementById("loginBtn");
-const closeLogin = document.getElementById("closeLogin");
-
-const leavePopup = document.getElementById("leavePopup");
-const leaveYes = document.getElementById("leaveYes");
-const leaveNo = document.getElementById("leaveNo");
-
-// --------------------------------------------------
-// FIREBASE IMPORTS
-// --------------------------------------------------
+// FIREBASE (fill in your config)
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import {
   getAuth,
   onAuthStateChanged,
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword
+  signInWithPopup,
+  GoogleAuthProvider,
+  signOut
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-
 import {
-  getDatabase,
-  ref,
-  set,
-  update,
-  onValue,
-  get,
-  remove
-} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+  getFirestore,
+  doc,
+  setDoc,
+  getDoc,
+  updateDoc,
+  onSnapshot,
+  arrayUnion
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-// --------------------------------------------------
-// FIREBASE CONFIG
-// --------------------------------------------------
 const firebaseConfig = {
-  apiKey: "AIzaSyC7J59ExJVU3j9meWZxpopAA0IqutOgX6Q",
-  authDomain: "puzzle-multiplayer-8.firebaseapp.com",
-  databaseURL: "https://puzzle-multiplayer-8-default-rtdb.asia-southeast1.firebasedatabase.app",
-  projectId: "puzzle-multiplayer-8",
-  storageBucket: "puzzle-multiplayer-8.appspot.com",
-  messagingSenderId: "513197674871",
-  appId: "1:513197674871:web:9a6553631d87518e5ad172",
-  measurementId: "G-FZPL8KLPQ7"
+  // TODO: put your config here
 };
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
-const db = getDatabase(app);
+const db = getFirestore(app);
+const provider = new GoogleAuthProvider();
 
-// --------------------------------------------------
 // STATE
-// --------------------------------------------------
 let currentUser = null;
+let currentUsername = null;
 let currentRoomCode = null;
 let isHost = false;
+let roomUnsub = null;
 
-// --------------------------------------------------
-// TAB SWITCHING
-// --------------------------------------------------
-practiceTab.addEventListener("click", () => {
-  showPractice();
-});
-
-multiplayerTab.addEventListener("click", () => {
-  if (!currentUser) {
-    loginPopup.classList.remove("hidden");
-    return;
-  }
-  showMultiplayer();
-});
-
-// --------------------------------------------------
-// LOGIN POPUP
-// --------------------------------------------------
-closeLogin.addEventListener("click", () => {
-  loginPopup.classList.add("hidden");
-  showPractice();
-});
-
-signupBtn.addEventListener("click", async () => {
-  const email = emailInput.value.trim();
-  const password = passwordInput.value.trim();
-  const username = usernameInput.value.trim();
-
-  if (!email || !password || !username) {
-    alert("Enter email, password, and username.");
-    return;
-  }
-
-  const usernameRef = ref(db, `usernames/${username}`);
-  const usernameSnap = await get(usernameRef);
-  if (usernameSnap.exists()) {
-    alert("Username already in use. Choose another.");
-    return;
-  }
-
-  try {
-    const cred = await createUserWithEmailAndPassword(auth, email, password);
-    const uid = cred.user.uid;
-
-    await set(ref(db, `users/${uid}`), {
-      uid,
-      email,
-      username
-    });
-
-    await set(ref(db, `usernames/${username}`), uid);
-
-    loginPopup.classList.add("hidden");
-    showMultiplayer();
-  } catch (err) {
-    alert(err.message);
-  }
-});
-
-loginBtn.addEventListener("click", async () => {
-  const email = emailInput.value.trim();
-  const password = passwordInput.value.trim();
-
-  if (!email || !password) {
-    alert("Enter email and password.");
-    return;
-  }
-
-  try {
-    await signInWithEmailAndPassword(auth, email, password);
-    loginPopup.classList.add("hidden");
-    showMultiplayer();
-  } catch (err) {
-    alert(err.message);
-  }
-});
-
-// --------------------------------------------------
 // AUTH STATE
-// --------------------------------------------------
-onAuthStateChanged(auth, (user) => {
-  currentUser = user;
+onAuthStateChanged(auth, async (user) => {
+  currentUser = user || null;
 
   if (!user) {
-    currentRoomCode = null;
-    isHost = false;
-    hideRoomUI();
+    currentUsername = null;
+    userNameCapsule.textContent = "Guest";
     showPractice();
+    return;
+  }
+
+  // Derive username from email before @
+  const email = user.email || "";
+  const baseName = email.split("@")[0] || "Player";
+  currentUsername = baseName;
+  userNameCapsule.textContent = currentUsername;
+});
+
+// PROFILE MENU
+userIcon.addEventListener("click", () => {
+  userMenu.classList.toggle("hidden");
+});
+
+document.addEventListener("click", (e) => {
+  if (!userMenu.classList.contains("hidden")) {
+    if (!userMenu.contains(e.target) && !userIcon.contains(e.target)) {
+      userMenu.classList.add("hidden");
+    }
   }
 });
 
-// --------------------------------------------------
-// ROOM / LOBBY LOGIC
-// --------------------------------------------------
+// LOGOUT
+logoutBtn.addEventListener("click", async () => {
+  userMenu.classList.add("hidden");
+  if (currentUser) {
+    await signOut(auth);
+  }
+  alert("You have been logged out.");
+  showPractice();
+});
+
+// LOGIN HELPER
+async function ensureLoggedIn() {
+  if (currentUser) return true;
+  try {
+    const result = await signInWithPopup(auth, provider);
+    currentUser = result.user;
+    const email = currentUser.email || "";
+    currentUsername = (email.split("@")[0] || "Player");
+    userNameCapsule.textContent = currentUsername;
+    return true;
+  } catch (e) {
+    console.error(e);
+    alert("Login cancelled.");
+    return false;
+  }
+}
+
+// ROOM HELPERS
 function generateRoomCode() {
   const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
   let code = "";
@@ -178,81 +117,35 @@ function generateRoomCode() {
   return code;
 }
 
-function showRoomUI(code) {
-  roomCodeText.textContent = "Room Code: " + code;
-  playerListContainer.classList.remove("hidden");
-  leaveMatchBtn.classList.remove("hidden");
-
-  if (isHost) startMatchBtn.classList.remove("hidden");
-  else startMatchBtn.classList.add("hidden");
-}
-
-function hideRoomUI() {
-  roomCodeText.textContent = "";
-  playerListContainer.classList.add("hidden");
-  startMatchBtn.classList.add("hidden");
-  leaveMatchBtn.classList.add("hidden");
-  playerList.innerHTML = "";
-}
-
-function listenToPlayers(roomCode) {
-  const playersRef = ref(db, `rooms/${roomCode}/players`);
-  onValue(playersRef, (snapshot) => {
-    playerList.innerHTML = "";
-    const players = snapshot.val() || {};
-    Object.values(players).forEach((p) => {
-      const li = document.createElement("li");
-      li.textContent = p.username
-        ? `${p.username}${p.isHost ? " (Host)" : ""}`
-        : `${p.name}${p.isHost ? " (Host)" : ""}`;
-      playerList.appendChild(li);
-    });
-  });
-}
-
-async function getUserProfile(uid) {
-  const userRef = ref(db, `users/${uid}`);
-  const snap = await get(userRef);
-  return snap.exists() ? snap.val() : null;
-}
-
 async function createRoom() {
-  if (!currentUser) {
-    loginPopup.classList.remove("hidden");
-    return;
-  }
-
-  const profile = await getUserProfile(currentUser.uid);
-  const username = profile?.username || currentUser.email;
+  const ok = await ensureLoggedIn();
+  if (!ok) return;
 
   const code = generateRoomCode();
-  const roomRef = ref(db, `rooms/${code}`);
+  const roomRef = doc(db, "rooms", code);
 
-  await set(roomRef, {
-    hostId: currentUser.uid,
-    status: "lobby",
-    players: {
-      [currentUser.uid]: {
+  await setDoc(roomRef, {
+    hostUid: currentUser.uid,
+    createdAt: Date.now(),
+    players: [
+      {
         uid: currentUser.uid,
-        name: currentUser.email,
-        username,
-        isHost: true
+        username: currentUsername,
+        joinedAt: Date.now()
       }
-    }
+    ]
   });
 
-  currentRoomCode = code;
   isHost = true;
-
-  showRoomUI(code);
-  listenToPlayers(code);
+  currentRoomCode = code;
+  roomCodeText.textContent = `Room code: ${code}`;
+  listenToRoom(code);
+  showMultiplayer();
 }
 
 async function joinRoom() {
-  if (!currentUser) {
-    loginPopup.classList.remove("hidden");
-    return;
-  }
+  const ok = await ensureLoggedIn();
+  if (!ok) return;
 
   const code = roomInput.value.trim().toUpperCase();
   if (!code) {
@@ -260,110 +153,71 @@ async function joinRoom() {
     return;
   }
 
-  const roomRef = ref(db, `rooms/${code}`);
-  const snap = await get(roomRef);
-
+  const roomRef = doc(db, "rooms", code);
+  const snap = await getDoc(roomRef);
   if (!snap.exists()) {
     alert("Room not found.");
     return;
   }
 
-  const roomData = snap.val();
-  if (roomData.status !== "lobby") {
-    alert("Match already started.");
+  const data = snap.data();
+  const players = data.players || [];
+
+  // PREVENT HOST OR SAME USER FROM REJOINING
+  const alreadyIn = players.some(p => p.uid === currentUser.uid);
+  if (alreadyIn) {
+    alert("You are already in this room.");
     return;
   }
 
-  const profile = await getUserProfile(currentUser.uid);
-  const username = profile?.username || currentUser.email;
-
-  await update(roomRef, {
-    [`players/${currentUser.uid}`]: {
+  await updateDoc(roomRef, {
+    players: arrayUnion({
       uid: currentUser.uid,
-      name: currentUser.email,
-      username,
-      isHost: false
-    }
+      username: currentUsername,
+      joinedAt: Date.now()
+    })
   });
 
+  isHost = (data.hostUid === currentUser.uid);
   currentRoomCode = code;
-  isHost = false;
-
-  showRoomUI(code);
-  listenToPlayers(code);
+  roomCodeText.textContent = `Room code: ${code}`;
+  listenToRoom(code);
+  showMultiplayer();
 }
 
-createRoomBtn.addEventListener("click", createRoom);
-joinRoomBtn.addEventListener("click", joinRoom);
-
-// --------------------------------------------------
-// START MATCH
-// --------------------------------------------------
-startMatchBtn.addEventListener("click", async () => {
-  if (!isHost || !currentRoomCode) return;
-  const roomRef = ref(db, `rooms/${currentRoomCode}`);
-  await update(roomRef, { status: "in-game" });
-  alert("Match started! (Puzzle sync can be added next.)");
-});
-
-// --------------------------------------------------
-// LEAVE MATCH
-// --------------------------------------------------
-leaveMatchBtn.addEventListener("click", () => {
-  leavePopup.classList.remove("hidden");
-});
-
-leaveNo.addEventListener("click", () => {
-  leavePopup.classList.add("hidden");
-});
-
-leaveYes.addEventListener("click", async () => {
-  leavePopup.classList.add("hidden");
-
-  if (!currentRoomCode || !currentUser) return;
-
-  const roomRef = ref(db, `rooms/${currentRoomCode}`);
-  const snap = await get(roomRef);
-
-  if (!snap.exists()) {
-    hideRoomUI();
-    return;
+function listenToRoom(code) {
+  if (roomUnsub) {
+    roomUnsub();
+    roomUnsub = null;
   }
 
-  const roomData = snap.val();
-
-  await update(roomRef, {
-    [`players/${currentUser.uid}`]: null
+  const roomRef = doc(db, "rooms", code);
+  roomUnsub = onSnapshot(roomRef, (snap) => {
+    if (!snap.exists()) {
+      playerList.innerHTML = "";
+      roomCodeText.textContent = "Room closed.";
+      return;
+    }
+    const data = snap.data();
+    const players = data.players || [];
+    renderPlayers(players);
   });
+}
 
-  if (roomData.hostId === currentUser.uid) {
-    await remove(roomRef);
-  }
+function renderPlayers(players) {
+  playerList.innerHTML = "";
+  players.forEach(p => {
+    const li = document.createElement("li");
+    li.textContent = p.username || "Player";
+    playerList.appendChild(li);
+  });
+}
 
-  currentRoomCode = null;
-  isHost = false;
-  hideRoomUI();
-  showPractice();
+// BUTTON EVENTS
+createRoomBtn.addEventListener("click", () => {
+  createRoom();
 });
 
-// USER ICON MENU
-const userIcon = document.getElementById("userIcon");
-const userMenu = document.getElementById("userMenu");
-const logoutBtn = document.getElementById("logoutBtn");
-
-// Toggle menu
-userIcon.addEventListener("click", () => {
-  userMenu.classList.toggle("hidden");
-});
-
-// Logout
-logoutBtn.addEventListener("click", async () => {
-  userMenu.classList.add("hidden");
-
-  if (currentUser) {
-    await auth.signOut();
-  }
-
-  alert("You have been logged out.");
-  showPractice();
+joinRoomBtn.addEventListener("click", () => {
+  joinRoom();
 });
