@@ -1,6 +1,5 @@
-// --------------------------------------------------
-// DOM ELEMENTS
-// --------------------------------------------------
+// PRACTICE MODE + SHARED UI (board, confetti, tabs)
+
 const board = document.getElementById("board");
 const movesText = document.getElementById("moves");
 const winPopup = document.getElementById("winPopup");
@@ -10,23 +9,17 @@ const restartBtn = document.getElementById("restartBtn");
 const confettiCanvas = document.getElementById("confetti");
 const confettiCtx = confettiCanvas.getContext("2d");
 
-const practiceTab = document.getElementById("practiceTab");
-const multiplayerTab = document.getElementById("multiplayerTab");
 const practicePanel = document.getElementById("practicePanel");
 const multiplayerPanel = document.getElementById("multiplayerPanel");
+const practiceTab = document.getElementById("practiceTab");
+const multiplayerTab = document.getElementById("multiplayerTab");
 
-// --------------------------------------------------
-// STATE
-// --------------------------------------------------
 let tiles = [];
 let emptyIndex = 8;
 let moves = 0;
 let confettiPieces = [];
 let confettiAnimationId = null;
 
-// --------------------------------------------------
-// VIEW HELPERS (exported)
-// --------------------------------------------------
 export function showPractice() {
   practiceTab.classList.add("active");
   multiplayerTab.classList.remove("active");
@@ -43,16 +36,10 @@ export function showMultiplayer() {
   movesText.style.display = "none";
 }
 
-// --------------------------------------------------
-// TILE SIZE (responsive)
-// --------------------------------------------------
 function getTileSize() {
   return window.innerWidth < 480 ? 95 : 130;
 }
 
-// --------------------------------------------------
-// INIT BOARD
-// --------------------------------------------------
 function initBoard() {
   tiles = generateSolvableBoard();
   emptyIndex = tiles.indexOf(null);
@@ -66,9 +53,6 @@ function initBoard() {
   stopConfetti();
 }
 
-// --------------------------------------------------
-// GENERATE SOLVABLE BOARD
-// --------------------------------------------------
 function generateSolvableBoard() {
   let arr;
   do {
@@ -103,9 +87,6 @@ function isSolvable(arr) {
   return inversions % 2 === 0;
 }
 
-// --------------------------------------------------
-// CREATE TILES
-// --------------------------------------------------
 function createTiles() {
   board.innerHTML = "";
 
@@ -131,9 +112,6 @@ function createTiles() {
   });
 }
 
-// --------------------------------------------------
-// UPDATE TILE POSITIONS
-// --------------------------------------------------
 function updateTilePositions() {
   const tileSize = getTileSize();
   const gap = 10;
@@ -153,9 +131,6 @@ function updateMoves() {
   movesText.textContent = "Moves: " + moves;
 }
 
-// --------------------------------------------------
-// GAME LOGIC
-// --------------------------------------------------
 function handleTileClick(index) {
   if (!isAdjacent(index, emptyIndex)) return;
 
@@ -184,9 +159,6 @@ function checkWin() {
   return tiles[8] === null;
 }
 
-// --------------------------------------------------
-// WIN HANDLING
-// --------------------------------------------------
 function onWin() {
   moveCountText.textContent = `You solved it in ${moves} moves!`;
   winPopup.classList.remove("hidden");
@@ -206,9 +178,7 @@ function hideRestart() {
   restartBtn.classList.add("hidden");
 }
 
-// --------------------------------------------------
-// CONFETTI
-// --------------------------------------------------
+/* CONFETTI */
 function resizeConfettiCanvas() {
   confettiCanvas.width = window.innerWidth;
   confettiCanvas.height = window.innerHeight;
@@ -265,9 +235,6 @@ window.addEventListener("resize", () => {
   updateTilePositions();
 });
 
-// --------------------------------------------------
-// EVENTS
-// --------------------------------------------------
 closePopup.addEventListener("click", () => {
   hideWin();
   stopConfetti();
@@ -277,8 +244,14 @@ restartBtn.addEventListener("click", () => {
   initBoard();
 });
 
-// --------------------------------------------------
-// INIT
-// --------------------------------------------------
+/* NAV TAB CLICKS (shared) */
+practiceTab.addEventListener("click", () => {
+  showPractice();
+});
+
+multiplayerTab.addEventListener("click", () => {
+  showMultiplayer();
+});
+
 showPractice();
 initBoard();
