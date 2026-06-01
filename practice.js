@@ -25,7 +25,7 @@ let confettiPieces = [];
 let confettiAnimationId = null;
 
 // --------------------------------------------------
-// TAB VIEW HELPERS (practice side)
+// VIEW HELPERS (exported)
 // --------------------------------------------------
 export function showPractice() {
   practiceTab.classList.add("active");
@@ -41,6 +41,13 @@ export function showMultiplayer() {
   practicePanel.classList.add("hidden");
   multiplayerPanel.classList.remove("hidden");
   movesText.style.display = "none";
+}
+
+// --------------------------------------------------
+// TILE SIZE (responsive)
+// --------------------------------------------------
+function getTileSize() {
+  return window.innerWidth < 480 ? 95 : 130;
 }
 
 // --------------------------------------------------
@@ -97,7 +104,7 @@ function isSolvable(arr) {
 }
 
 // --------------------------------------------------
-// CREATE TILES ONCE
+// CREATE TILES
 // --------------------------------------------------
 function createTiles() {
   board.innerHTML = "";
@@ -109,9 +116,15 @@ function createTiles() {
     tile.classList.add("tile");
     tile.textContent = value;
 
-    tile.addEventListener("click", () => {
+    const handle = () => {
       const currentIndex = tiles.indexOf(value);
       handleTileClick(currentIndex);
+    };
+
+    tile.addEventListener("click", handle);
+    tile.addEventListener("touchstart", (e) => {
+      e.preventDefault();
+      handle();
     });
 
     board.appendChild(tile);
@@ -119,15 +132,13 @@ function createTiles() {
 }
 
 // --------------------------------------------------
-// UPDATE TILE POSITIONS (smooth)
+// UPDATE TILE POSITIONS
 // --------------------------------------------------
 function updateTilePositions() {
-  const tileSize = 135;
+  const tileSize = getTileSize();
   const gap = 10;
 
-  const tileElements = document.querySelectorAll(".tile");
-
-  tileElements.forEach(tile => {
+  document.querySelectorAll(".tile").forEach(tile => {
     const value = parseInt(tile.textContent);
     const index = tiles.indexOf(value);
     const row = Math.floor(index / 3);
@@ -251,6 +262,7 @@ window.addEventListener("resize", () => {
   if (confettiCanvas.style.display === "block") {
     resizeConfettiCanvas();
   }
+  updateTilePositions();
 });
 
 // --------------------------------------------------
