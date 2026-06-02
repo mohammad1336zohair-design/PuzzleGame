@@ -306,4 +306,88 @@ button:hover {
   box-shadow: 0 0 22px #0099ff;
 }
 
+/* ============================
+   FULLSCREEN LOGIN OVERLAY
+   ============================ */
+
+#loginOverlay {
+  position: fixed;
+  top: 70px; /* navbar stays visible */
+  left: 0;
+  width: 100%;
+  height: calc(100vh - 70px);
+  background: rgba(0, 0, 0, 0.92);
+  backdrop-filter: blur(12px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 99999;
+}
+
+#loginOverlay.hidden {
+  display: none;
+}
+
+#loginBox {
+  width: 420px;
+  padding: 40px;
+  border-radius: 22px;
+  background: linear-gradient(135deg, #001020, #000000);
+  box-shadow: 0 0 35px #0099ff, 0 0 70px #0066ff inset;
+  text-align: center;
+  border: 2px solid #007bff;
+}
+
+#loginBox h1 {
+  color: #66b3ff;
+  font-size: 36px;
+  margin-bottom: 10px;
+  text-shadow: 0 0 12px #008cff;
+}
+
+#loginBox p {
+  color: #cfe8ff;
+  margin-bottom: 25px;
+  font-size: 18px;
+}
+
+/* Google Login Button */
+#googleLoginBtn {
+  width: 100%;
+  padding: 14px;
+  font-size: 18px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #004cff, #0077ff);
+  border: none;
+  color: white;
+  box-shadow: 0 0 15px #0066ff;
+  cursor: pointer;
+  transition: 0.2s;
+  margin-bottom: 15px;
+}
+
+#googleLoginBtn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0 25px #0099ff;
+}
+
+/* Nevermind Button */
+.cancel-btn {
+  width: 100%;
+  padding: 12px;
+  font-size: 16px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid #66b3ff;
+  color: #cfe8ff;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.cancel-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: translateY(-2px);
+}
+
+
 
