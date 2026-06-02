@@ -252,6 +252,25 @@ async function ensureLoggedIn() {
 }
 
 // ===============================
+// USER ICON DROPDOWN
+// ===============================
+
+const userIcon = document.getElementById("userIcon");
+const userMenu = document.getElementById("userMenu");
+
+userIcon.addEventListener("click", () => {
+  userMenu.classList.toggle("hidden");
+});
+
+// Close dropdown when clicking outside
+document.addEventListener("click", (e) => {
+  if (!userIconContainer.contains(e.target)) {
+    userMenu.classList.add("hidden");
+  }
+});
+
+
+// ===============================
 // MULTIPLAYER ROOM SYSTEM
 // ===============================
 
