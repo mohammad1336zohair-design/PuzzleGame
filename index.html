@@ -7,16 +7,39 @@
 </head>
 <body>
 
-  <!-- FULLSCREEN LOGIN -->
-  <div id="loginOverlay">
-    <div id="loginBox">
-      <h1>Welcome</h1>
-      <p>Sign in to access Multiplayer</p>
+  <!-- FULLSCREEN LOGIN OVERLAY -->
+<div id="loginOverlay" class="hidden">
 
-      <button id="googleLoginBtn">Sign in with Google</button>
-      <button id="cancelLoginBtn" class="cancel-btn">Nevermind</button>
-    </div>
+  <!-- STEP 1: EMAIL -->
+  <div id="loginStepEmail" class="loginStep">
+    <h1>Sign In</h1>
+    <p>Enter your email to continue</p>
+    <input id="loginEmail" type="email" placeholder="Email" />
+    <button id="emailNextBtn">Next</button>
+    <button id="googleLoginBtn">Sign in with Google</button>
+    <button id="cancelLoginBtn" class="cancel-btn">Nevermind</button>
   </div>
+
+  <!-- STEP 2: PASSWORD -->
+  <div id="loginStepPassword" class="loginStep hidden">
+    <h1>Welcome Back</h1>
+    <p>Enter your password</p>
+    <input id="loginPassword" type="password" placeholder="Password" />
+    <button id="passwordLoginBtn">Log In</button>
+    <button id="backToEmailBtn" class="cancel-btn">Back</button>
+  </div>
+
+  <!-- STEP 3: USERNAME -->
+  <div id="loginStepUsername" class="loginStep hidden">
+    <h1>Create Account</h1>
+    <p>Choose a username</p>
+    <input id="loginUsername" type="text" placeholder="Username" />
+    <button id="createAccountBtn">Create Account</button>
+    <button id="backToPasswordBtn" class="cancel-btn">Back</button>
+  </div>
+
+</div>
+
 
   <!-- NAVBAR -->
   <header id="navWrapper">
