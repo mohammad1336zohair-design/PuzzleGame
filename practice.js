@@ -243,11 +243,19 @@ closePopup.addEventListener("click", () => {
 practiceTab.addEventListener("click", showPractice);
 
 multiplayerTab.addEventListener("click", async () => {
+  // Make sure ensureLoggedIn exists
+  if (typeof ensureLoggedIn !== "function") {
+    console.error("ensureLoggedIn is missing");
+    window.showMultiplayer();
+    return;
+  }
+
   const loggedIn = await ensureLoggedIn();
   if (loggedIn) {
     window.showMultiplayer();
   }
 });
+
 
 
 window.addEventListener("resize", () => {
