@@ -187,6 +187,54 @@ button:hover {
   border: 2px solid white;
 }
 
+#userIconContainer {
+  position: relative;
+  cursor: pointer;
+}
+
+#userMenu {
+  position: absolute;
+  top: 45px;
+  right: 0;
+  background: #001020;
+  border: 1px solid #007bff;
+  border-radius: 10px;
+  padding: 10px;
+  width: 150px;
+  box-shadow: 0 0 15px #0066ff;
+  z-index: 9999;
+}
+
+#userMenu.hidden {
+  display: none;
+}
+
+#userNameCapsule {
+  color: #66b3ff;
+  margin-bottom: 10px;
+  text-align: center;
+}
+
+.userMenuDivider {
+  height: 1px;
+  background: #007bff;
+  margin: 8px 0;
+}
+
+#logoutBtn {
+  width: 100%;
+  padding: 8px;
+  border-radius: 8px;
+  background: #004cff;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+#logoutBtn:hover {
+  background: #0066ff;
+}
+
 /* BODY */
 #userIcon::after {
   content: "";
