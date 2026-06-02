@@ -205,6 +205,12 @@ button:hover {
   z-index: 9999;
 }
 
+#userMenu,
+#userIconContainer {
+  z-index: 100000;
+}
+
+
 #userMenu.hidden {
   display: none;
 }
