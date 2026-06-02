@@ -105,6 +105,25 @@ emailNextBtn.addEventListener("click", async () => {
     return;
   }
 
+  // Check if email already has an account
+  try {
+    await signInWithEmailAndPassword(auth, tempEmail, "dummyPassword");
+  } catch (err) {
+    if (err.code === "auth/user-not-found") {
+      isNewUser = true;
+      showStep("password");
+      return;
+    }
+
+    if (err.code === "auth/wrong-password") {
+      isNewUser = false;
+      showStep("password");
+      return;
+    }
+  }
+});
+
+
   const userDoc = await getDoc(doc(db, "users", tempEmail.toLowerCase()));
 
   if (userDoc.exists()) {
