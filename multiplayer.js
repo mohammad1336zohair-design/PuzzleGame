@@ -185,6 +185,14 @@ createAccountBtn.addEventListener("click", async () => {
   }
 });
 
+logoutBtn.addEventListener("click", async () => {
+  await auth.signOut();
+  userMenu.classList.add("hidden");
+  userNameCapsule.textContent = "Guest";
+  window.showPractice();
+});
+
+
 // ===============================
 // GOOGLE LOGIN
 // ===============================
