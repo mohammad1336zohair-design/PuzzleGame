@@ -1,41 +1,54 @@
-// MULTIPLAYER + AUTH + PROFILE MENU
+// ===============================
+// MULTIPLAYER AUTH + LOGIN FLOW
+// ===============================
 
-/* DOM */
-const createRoomBtn = document.getElementById("createRoomBtn");
-const joinRoomBtn = document.getElementById("joinRoomBtn");
-const roomInput = document.getElementById("roomInput");
-const roomCodeText = document.getElementById("roomCodeText");
-const playerList = document.getElementById("playerList");
+// DOM ELEMENTS
+const loginOverlay = document.getElementById("loginOverlay");
 
-const userIcon = document.getElementById("userIcon");
-const userMenu = document.getElementById("userMenu");
-const logoutBtn = document.getElementById("logoutBtn");
+const stepEmail = document.getElementById("loginStepEmail");
+const stepPassword = document.getElementById("loginStepPassword");
+const stepUsername = document.getElementById("loginStepUsername");
+
+const emailInput = document.getElementById("loginEmail");
+const passwordInput = document.getElementById("loginPassword");
+const usernameInput = document.getElementById("loginUsername");
+
+const emailNextBtn = document.getElementById("emailNextBtn");
+const passwordLoginBtn = document.getElementById("passwordLoginBtn");
+const createAccountBtn = document.getElementById("createAccountBtn");
+
+const googleLoginBtn = document.getElementById("googleLoginBtn");
+const cancelLoginBtn = document.getElementById("cancelLoginBtn");
+
+const backToEmailBtn = document.getElementById("backToEmailBtn");
+const backToPasswordBtn = document.getElementById("backToPasswordBtn");
+
 const userNameCapsule = document.getElementById("userNameCapsule");
+const userIconContainer = document.getElementById("userIconContainer");
 
-/* FIREBASE IMPORTS */
+// FIREBASE IMPORTS
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import {
   getAuth,
-  onAuthStateChanged,
-  signInWithPopup,
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
   GoogleAuthProvider,
-  signOut
+  signInWithPopup,
+  onAuthStateChanged
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
 import {
   getFirestore,
   doc,
   setDoc,
   getDoc,
-  updateDoc,
-  onSnapshot,
-  arrayUnion
+  updateDoc
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-/* YOUR FIREBASE CONFIG — INSTALLED */
+// FIREBASE CONFIG
 const firebaseConfig = {
   apiKey: "AIzaSyC7J59ExJVU3j9meWZxpopAA0IqutOgX6Q",
   authDomain: "puzzle-multiplayer-8.firebaseapp.com",
-  databaseURL: "https://puzzle-multiplayer-8-default-rtdb.asia-southeast1.firebasedatabase.app",
   projectId: "puzzle-multiplayer-8",
   storageBucket: "puzzle-multiplayer-8.firebasestorage.app",
   messagingSenderId: "513197674871",
@@ -46,120 +59,243 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
-const provider = new GoogleAuthProvider();
+const googleProvider = new GoogleAuthProvider();
 
-/* STATE */
-let currentUser = null;
-let currentUsername = "Guest";
-let currentRoomCode = null;
-let roomUnsub = null;
+// STATE
+let tempEmail = "";
+let tempPassword = "";
+let tempUsername = "";
+let isNewUser = false;
 
-/* AUTH STATE LISTENER */
-onAuthStateChanged(auth, (user) => {
-  currentUser = user || null;
+// ===============================
+// LOGIN OVERLAY CONTROL
+// ===============================
 
-  if (!user) {
-    currentUsername = "Guest";
-    userNameCapsule.textContent = "Guest";
-    window.showPractice();
+function openLogin() {
+  loginOverlay.classList.remove("hidden");
+  showStep("email");
+}
+
+function closeLogin() {
+  loginOverlay.classList.add("hidden");
+  emailInput.value = "";
+  passwordInput.value = "";
+  usernameInput.value = "";
+}
+
+function showStep(step) {
+  stepEmail.classList.add("hidden");
+  stepPassword.classList.add("hidden");
+  stepUsername.classList.add("hidden");
+
+  if (step === "email") stepEmail.classList.remove("hidden");
+  if (step === "password") stepPassword.classList.remove("hidden");
+  if (step === "username") stepUsername.classList.remove("hidden");
+}
+
+// ===============================
+// EMAIL STEP
+// ===============================
+
+emailNextBtn.addEventListener("click", async () => {
+  tempEmail = emailInput.value.trim();
+
+  if (!tempEmail) {
+    alert("Enter your email.");
     return;
   }
 
-  const email = user.email || "";
-  currentUsername = email.split("@")[0] || "Player";
-  userNameCapsule.textContent = currentUsername;
-});
+  const userDoc = await getDoc(doc(db, "users", tempEmail.toLowerCase()));
 
-/* PROFILE MENU */
-userIcon.addEventListener("click", (e) => {
-  e.stopPropagation();
-  userMenu.classList.toggle("hidden");
-});
-
-document.addEventListener("click", (e) => {
-  if (!userMenu.contains(e.target) && !userIcon.contains(e.target)) {
-    userMenu.classList.add("hidden");
+  if (userDoc.exists()) {
+    isNewUser = false;
+    showStep("password");
+  } else {
+    isNewUser = true;
+    showStep("password");
   }
 });
 
-/* LOGOUT */
-logoutBtn.addEventListener("click", async () => {
-  userMenu.classList.add("hidden");
-  if (currentUser) await signOut(auth);
-  alert("Logged out.");
+// ===============================
+// PASSWORD STEP
+// ===============================
+
+passwordLoginBtn.addEventListener("click", async () => {
+  tempPassword = passwordInput.value.trim();
+
+  if (!tempPassword) {
+    alert("Enter your password.");
+    return;
+  }
+
+  if (!isNewUser) {
+    // Existing user → log in
+    try {
+      await signInWithEmailAndPassword(auth, tempEmail, tempPassword);
+      closeLogin();
+    } catch (err) {
+      alert("Incorrect password.");
+    }
+  } else {
+    // New user → go to username step
+    showStep("username");
+  }
+});
+
+// ===============================
+// USERNAME STEP
+// ===============================
+
+createAccountBtn.addEventListener("click", async () => {
+  tempUsername = usernameInput.value.trim();
+
+  if (!tempUsername) {
+    alert("Enter a username.");
+    return;
+  }
+
+  const lower = tempUsername.toLowerCase();
+
+  // Check uniqueness
+  const nameDoc = await getDoc(doc(db, "usernames", lower));
+  if (nameDoc.exists()) {
+    alert("Username already taken.");
+    return;
+  }
+
+  try {
+    // Create account
+    const userCred = await createUserWithEmailAndPassword(auth, tempEmail, tempPassword);
+    const uid = userCred.user.uid;
+
+    // Store username in BOTH places
+    await setDoc(doc(db, "usernames", lower), {
+      uid: uid,
+      username: tempUsername
+    });
+
+    await setDoc(doc(db, "users", uid), {
+      email: tempEmail,
+      username: tempUsername
+    });
+
+    closeLogin();
+  } catch (err) {
+    alert("Error creating account.");
+  }
+});
+
+// ===============================
+// GOOGLE LOGIN
+// ===============================
+
+googleLoginBtn.addEventListener("click", async () => {
+  try {
+    const result = await signInWithPopup(auth, googleProvider);
+    const user = result.user;
+
+    const profileRef = doc(db, "users", user.uid);
+    const profileSnap = await getDoc(profileRef);
+
+    if (!profileSnap.exists()) {
+      // New Google user → ask for username
+      isNewUser = true;
+      showStep("username");
+    } else {
+      closeLogin();
+    }
+  } catch (err) {
+    alert("Google login failed.");
+  }
+});
+
+// ===============================
+// NEVERMIND BUTTON
+// ===============================
+
+cancelLoginBtn.addEventListener("click", () => {
+  closeLogin();
   window.showPractice();
 });
 
-/* LOGIN */
-import { signInWithRedirect, getRedirectResult } 
-from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+// BACK BUTTONS
+backToEmailBtn.addEventListener("click", () => showStep("email"));
+backToPasswordBtn.addEventListener("click", () => showStep("password"));
+
+// ===============================
+// AUTH STATE LISTENER
+// ===============================
+
+onAuthStateChanged(auth, async (user) => {
+  if (!user) {
+    userIconContainer.classList.add("hidden");
+    userNameCapsule.textContent = "Guest";
+    return;
+  }
+
+  userIconContainer.classList.remove("hidden");
+
+  const profile = await getDoc(doc(db, "users", user.uid));
+  if (profile.exists()) {
+    userNameCapsule.textContent = profile.data().username;
+  }
+});
+
+// ===============================
+// REQUIRE LOGIN FOR MULTIPLAYER
+// ===============================
 
 async function ensureLoggedIn() {
-  if (currentUser) return true;
-
-  document.getElementById("loginScreen").classList.remove("hidden");
-  document.getElementById("practicePanel").classList.add("hidden");
-  document.getElementById("multiplayerPanel").classList.add("hidden");
-
+  if (auth.currentUser) return true;
+  openLogin();
   return false;
 }
 
-document.getElementById("googleLoginBtn").addEventListener("click", () => {
-  signInWithRedirect(auth, provider);
-});
+// ===============================
+// MULTIPLAYER ROOM SYSTEM
+// ===============================
 
-// Handle redirect result
-getRedirectResult(auth).then((result) => {
-  if (result && result.user) {
-    currentUser = result.user;
-    currentUsername = currentUser.email.split("@")[0];
-    userNameCapsule.textContent = currentUsername;
+// DOM ELEMENTS
+const createRoomBtn = document.getElementById("createRoomBtn");
+const joinRoomBtn = document.getElementById("joinRoomBtn");
+const roomInput = document.getElementById("roomInput");
+const roomCodeText = document.getElementById("roomCodeText");
+const playerList = document.getElementById("playerList");
 
-    document.getElementById("loginScreen").classList.add("hidden");
-    window.showMultiplayer();
-  }
-});
+// STATE
+let currentRoom = null;
+let roomUnsub = null;
 
+// ===============================
+// CREATE ROOM
+// ===============================
 
-/* ROOM CODE GENERATOR */
-function generateRoomCode() {
-  const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
-  let code = "";
-  for (let i = 0; i < 6; i++) {
-    code += chars[Math.floor(Math.random() * chars.length)];
-  }
-  return code;
-}
+createRoomBtn.addEventListener("click", async () => {
+  const loggedIn = await ensureLoggedIn();
+  if (!loggedIn) return;
 
-/* CREATE ROOM */
-async function createRoom() {
-  const ok = await ensureLoggedIn();
-  if (!ok) return;
+  const user = auth.currentUser;
+  const profile = await getDoc(doc(db, "users", user.uid));
+  const username = profile.data().username;
 
-  const code = generateRoomCode();
-  const ref = doc(db, "rooms", code);
+  const roomCode = Math.random().toString(36).substring(2, 7).toUpperCase();
 
-  await setDoc(ref, {
-    hostUid: currentUser.uid,
-    players: [
-      {
-        uid: currentUser.uid,
-        username: currentUsername,
-        joinedAt: Date.now()
-      }
-    ]
+  await setDoc(doc(db, "rooms", roomCode), {
+    players: {
+      [user.uid]: username
+    }
   });
 
-  currentRoomCode = code;
-  roomCodeText.textContent = `Room code: ${code}`;
-  listenToRoom(code);
-  window.showMultiplayer();
-}
+  joinRoom(roomCode);
+});
 
-/* JOIN ROOM */
-async function joinRoom() {
-  const ok = await ensureLoggedIn();
-  if (!ok) return;
+// ===============================
+// JOIN ROOM
+// ===============================
+
+joinRoomBtn.addEventListener("click", async () => {
+  const loggedIn = await ensureLoggedIn();
+  if (!loggedIn) return;
 
   const code = roomInput.value.trim().toUpperCase();
   if (!code) {
@@ -167,63 +303,108 @@ async function joinRoom() {
     return;
   }
 
-  const ref = doc(db, "rooms", code);
-  const snap = await getDoc(ref);
+  const roomRef = doc(db, "rooms", code);
+  const roomSnap = await getDoc(roomRef);
 
-  if (!snap.exists()) {
+  if (!roomSnap.exists()) {
     alert("Room not found.");
     return;
   }
 
-  const data = snap.data();
-  const players = data.players || [];
+  joinRoom(code);
+});
 
-  if (players.some(p => p.uid === currentUser.uid)) {
-    alert("You are already in this room.");
-    return;
-  }
+// ===============================
+// JOIN ROOM LOGIC
+// ===============================
 
-  await updateDoc(ref, {
-    players: arrayUnion({
-      uid: currentUser.uid,
-      username: currentUsername,
-      joinedAt: Date.now()
-    })
+async function joinRoom(code) {
+  const user = auth.currentUser;
+  const profile = await getDoc(doc(db, "users", user.uid));
+  const username = profile.data().username;
+
+  currentRoom = code;
+
+  // Add player to room
+  await updateDoc(doc(db, "rooms", code), {
+    [`players.${user.uid}`]: username
   });
 
-  currentRoomCode = code;
-  roomCodeText.textContent = `Room code: ${code}`;
+  roomCodeText.textContent = "Room Code: " + code;
+
   listenToRoom(code);
-  window.showMultiplayer();
 }
 
-/* LISTEN TO ROOM */
+// ===============================
+// LISTEN TO ROOM
+// ===============================
+
 function listenToRoom(code) {
   if (roomUnsub) roomUnsub();
 
-  const ref = doc(db, "rooms", code);
-  roomUnsub = onSnapshot(ref, (snap) => {
+  const roomRef = doc(db, "rooms", code);
+
+  roomUnsub = onSnapshot(roomRef, (snap) => {
     if (!snap.exists()) {
-      playerList.innerHTML = "";
-      roomCodeText.textContent = "Room closed.";
+      alert("Room closed.");
+      leaveRoom();
       return;
     }
 
     const data = snap.data();
-    renderPlayers(data.players || []);
+    updatePlayerList(data.players);
   });
 }
 
-/* RENDER PLAYERS */
-function renderPlayers(players) {
+// ===============================
+// UPDATE PLAYER LIST UI
+// ===============================
+
+function updatePlayerList(players) {
   playerList.innerHTML = "";
-  players.forEach(p => {
+
+  Object.values(players).forEach((name) => {
     const li = document.createElement("li");
-    li.textContent = p.username;
+    li.textContent = name;
     playerList.appendChild(li);
   });
 }
 
-/* BUTTON EVENTS */
-createRoomBtn.addEventListener("click", createRoom);
-joinRoomBtn.addEventListener("click", joinRoom);
+// ===============================
+// LEAVE ROOM
+// ===============================
+
+async function leaveRoom() {
+  if (!currentRoom) return;
+
+  const user = auth.currentUser;
+  if (!user) return;
+
+  const roomRef = doc(db, "rooms", currentRoom);
+  const roomSnap = await getDoc(roomRef);
+
+  if (roomSnap.exists()) {
+    const data = roomSnap.data();
+    const players = data.players;
+
+    delete players[user.uid];
+
+    if (Object.keys(players).length === 0) {
+      // Delete empty room
+      await setDoc(roomRef, {}, { merge: false });
+    } else {
+      await updateDoc(roomRef, { players });
+    }
+  }
+
+  if (roomUnsub) roomUnsub();
+  roomUnsub = null;
+
+  currentRoom = null;
+  roomCodeText.textContent = "";
+  playerList.innerHTML = "";
+}
+
+// Leave room when closing tab
+window.addEventListener("beforeunload", leaveRoom);
+
