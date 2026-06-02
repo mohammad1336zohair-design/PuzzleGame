@@ -229,12 +229,14 @@ googleLoginBtn.addEventListener("click", async () => {
       isNewUser = true;
       showStep("username");
     } else {
+      // Existing Google user → close login
       closeLogin();
     }
   } catch (err) {
     alert("Google login failed.");
   }
 });
+
 
 // ===============================
 // NEVERMIND BUTTON
