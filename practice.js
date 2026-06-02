@@ -242,10 +242,13 @@ closePopup.addEventListener("click", () => {
 
 practiceTab.addEventListener("click", showPractice);
 
-multiplayerTab.addEventListener("click", () => {
-  // Multiplayer login handled in multiplayer.js
-  window.showMultiplayer();
+multiplayerTab.addEventListener("click", async () => {
+  const loggedIn = await ensureLoggedIn();
+  if (loggedIn) {
+    window.showMultiplayer();
+  }
 });
+
 
 window.addEventListener("resize", () => {
   if (confettiCanvas.style.display === "block") resizeConfettiCanvas();
