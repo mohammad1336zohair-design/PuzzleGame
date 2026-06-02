@@ -328,7 +328,7 @@ button:hover {
   display: none;
 }
 
-#loginBox {
+.loginStep {
   width: 420px;
   padding: 40px;
   border-radius: 22px;
@@ -338,20 +338,37 @@ button:hover {
   border: 2px solid #007bff;
 }
 
-#loginBox h1 {
+.loginStep.hidden {
+  display: none;
+}
+
+.loginStep h1 {
   color: #66b3ff;
   font-size: 36px;
   margin-bottom: 10px;
   text-shadow: 0 0 12px #008cff;
 }
 
-#loginBox p {
+.loginStep p {
   color: #cfe8ff;
   margin-bottom: 25px;
   font-size: 18px;
 }
 
-/* Google Login Button */
+.loginStep input {
+  width: 100%;
+  padding: 14px;
+  margin-bottom: 20px;
+  border-radius: 12px;
+  border: 1px solid #66b3ff;
+  background: rgba(255, 255, 255, 0.05);
+  color: white;
+  font-size: 16px;
+}
+
+#emailNextBtn,
+#passwordLoginBtn,
+#createAccountBtn,
 #googleLoginBtn {
   width: 100%;
   padding: 14px;
@@ -366,12 +383,14 @@ button:hover {
   margin-bottom: 15px;
 }
 
+#emailNextBtn:hover,
+#passwordLoginBtn:hover,
+#createAccountBtn:hover,
 #googleLoginBtn:hover {
   transform: translateY(-2px);
   box-shadow: 0 0 25px #0099ff;
 }
 
-/* Nevermind Button */
 .cancel-btn {
   width: 100%;
   padding: 12px;
@@ -388,6 +407,4 @@ button:hover {
   background: rgba(255, 255, 255, 0.2);
   transform: translateY(-2px);
 }
-
-
 
