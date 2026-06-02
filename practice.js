@@ -1,5 +1,8 @@
+// ===============================
 // PRACTICE MODE + NAVIGATION + CONFETTI
+// ===============================
 
+// DOM ELEMENTS
 const board = document.getElementById("board");
 const movesText = document.getElementById("moves");
 const winPopup = document.getElementById("winPopup");
@@ -15,47 +18,63 @@ const multiplayerTab = document.getElementById("multiplayerTab");
 const confettiCanvas = document.getElementById("confetti");
 const confettiCtx = confettiCanvas.getContext("2d");
 
+// STATE
 let tiles = [];
 let emptyIndex = 8;
 let moves = 0;
 let confettiPieces = [];
 let confettiAnimationId = null;
 
-/* NAVIGATION */
+// ===============================
+// NAVIGATION
+// ===============================
+
 function showPractice() {
   practiceTab.classList.add("active");
   multiplayerTab.classList.remove("active");
+
   practicePanel.classList.remove("hidden");
   multiplayerPanel.classList.add("hidden");
+
   movesText.style.display = "block";
+
+  // Practice mode ALWAYS shows Guest
+  const userNameCapsule = document.getElementById("userNameCapsule");
+  userNameCapsule.textContent = "Guest";
 }
 
 function showMultiplayer() {
   practiceTab.classList.remove("active");
   multiplayerTab.classList.add("active");
+
   practicePanel.classList.add("hidden");
   multiplayerPanel.classList.remove("hidden");
+
   movesText.style.display = "none";
 }
 
 window.showPractice = showPractice;
 window.showMultiplayer = showMultiplayer;
 
-/* BOARD INIT */
+// ===============================
+// BOARD INITIALIZATION
+// ===============================
+
 function initBoard() {
   tiles = generateSolvableBoard();
   emptyIndex = tiles.indexOf(null);
 
   createTiles();
   updateTilePositions();
+
   moves = 0;
   movesText.textContent = "Moves: 0";
+
   winPopup.classList.add("hidden");
   restartBtn.classList.add("hidden");
   stopConfetti();
 }
 
-/* GENERATE SOLVABLE BOARD */
 function generateSolvableBoard() {
   let arr;
   do {
@@ -90,11 +109,15 @@ function isSolvable(arr) {
   return inv % 2 === 0;
 }
 
-/* CREATE TILES */
+// ===============================
+// TILE CREATION + MOVEMENT
+// ===============================
+
 function createTiles() {
   board.innerHTML = "";
   tiles.forEach((value) => {
     if (value === null) return;
+
     const tile = document.createElement("div");
     tile.classList.add("tile");
     tile.textContent = value;
@@ -108,7 +131,6 @@ function createTiles() {
   });
 }
 
-/* UPDATE POSITIONS */
 function updateTilePositions() {
   const size = window.innerWidth < 480 ? 95 : 130;
   const gap = 10;
@@ -124,7 +146,6 @@ function updateTilePositions() {
   });
 }
 
-/* MOVE TILE */
 function handleTileClick(index) {
   if (!isAdjacent(index, emptyIndex)) return;
 
@@ -133,6 +154,7 @@ function handleTileClick(index) {
 
   moves++;
   movesText.textContent = "Moves: " + moves;
+
   updateTilePositions();
 
   if (isSolved(tiles)) onWin();
@@ -144,7 +166,10 @@ function isAdjacent(a, b) {
   return Math.abs(r1 - r2) + Math.abs(c1 - c2) === 1;
 }
 
-/* WIN */
+// ===============================
+// WIN LOGIC
+// ===============================
+
 function onWin() {
   moveCountText.textContent = `You solved it in ${moves} moves!`;
   winPopup.classList.remove("hidden");
@@ -152,7 +177,10 @@ function onWin() {
   startConfetti();
 }
 
-/* CONFETTI */
+// ===============================
+// CONFETTI
+// ===============================
+
 function resizeConfettiCanvas() {
   confettiCanvas.width = window.innerWidth;
   confettiCanvas.height = window.innerHeight;
@@ -173,15 +201,18 @@ function createConfetti() {
 
 function drawConfetti() {
   confettiCtx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
+
   confettiPieces.forEach(p => {
     confettiCtx.fillStyle = p.color;
     confettiCtx.fillRect(p.x, p.y, p.size, p.size);
     p.y += p.speedY;
+
     if (p.y > confettiCanvas.height) {
       p.y = -10;
       p.x = Math.random() * confettiCanvas.width;
     }
   });
+
   confettiAnimationId = requestAnimationFrame(drawConfetti);
 }
 
@@ -198,19 +229,22 @@ function stopConfetti() {
   confettiCtx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
 }
 
-/* EVENTS */
+// ===============================
+// EVENTS
+// ===============================
+
 restartBtn.addEventListener("click", initBoard);
+
 closePopup.addEventListener("click", () => {
   winPopup.classList.add("hidden");
   stopConfetti();
 });
+
 practiceTab.addEventListener("click", showPractice);
+
 multiplayerTab.addEventListener("click", () => {
-  if (!window.currentUser) {
-    document.getElementById("loginScreen").classList.remove("hidden");
-    return;
-  }
-  showMultiplayer();
+  // Multiplayer login handled in multiplayer.js
+  window.showMultiplayer();
 });
 
 window.addEventListener("resize", () => {
@@ -218,6 +252,9 @@ window.addEventListener("resize", () => {
   updateTilePositions();
 });
 
-/* INIT */
+// ===============================
+// INIT
+// ===============================
+
 initBoard();
 showPractice();
