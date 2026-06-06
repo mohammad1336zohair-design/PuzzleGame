@@ -124,17 +124,6 @@ emailNextBtn.addEventListener("click", async () => {
 });
 
 
-  const userDoc = await getDoc(doc(db, "users", tempEmail.toLowerCase()));
-
-  if (userDoc.exists()) {
-    isNewUser = false;
-    showStep("password");
-  } else {
-    isNewUser = true;
-    showStep("password");
-  }
-});
-
 // ===============================
 // PASSWORD STEP
 // ===============================
