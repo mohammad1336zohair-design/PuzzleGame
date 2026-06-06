@@ -168,8 +168,17 @@ createAccountBtn.addEventListener("click", async () => {
     return;
   }
 
-  const user = auth.currentUser;
-  const uid = user.uid;
+ const user = auth.currentUser || await new Promise(resolve => {
+  const unsub = onAuthStateChanged(auth, u => {
+    if (u) {
+      unsub();
+      resolve(u);
+    }
+  });
+});
+
+const uid = user.uid;
+
 
   await setDoc(doc(db, "usernames", lower), {
     uid: uid,
@@ -201,11 +210,13 @@ googleLoginBtn.addEventListener("click", async () => {
     const result = await signInWithPopup(auth, googleProvider);
     const user = result.user;
 
+    // Wait for Firebase to finish updating auth state
+    await new Promise(resolve => setTimeout(resolve, 300));
+
     const profileRef = doc(db, "users", user.uid);
     const profileSnap = await getDoc(profileRef);
 
     if (!profileSnap.exists()) {
-      // New Google user → ask for username
       isNewUser = true;
       showStep("username");
     } else {
@@ -215,7 +226,6 @@ googleLoginBtn.addEventListener("click", async () => {
     alert("Google login failed.");
   }
 });
-
 
 
 
