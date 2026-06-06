@@ -185,28 +185,6 @@ createAccountBtn.addEventListener("click", async () => {
 });
 
 
-  try {
-    // Create account
-    const userCred = await createUserWithEmailAndPassword(auth, tempEmail, tempPassword);
-    const uid = userCred.user.uid;
-
-    // Store username in BOTH places
-    await setDoc(doc(db, "usernames", lower), {
-      uid: uid,
-      username: tempUsername
-    });
-
-    await setDoc(doc(db, "users", uid), {
-      email: tempEmail,
-      username: tempUsername
-    });
-
-    closeLogin();
-  } catch (err) {
-    alert("Error creating account.");
-  }
-});
-
 logoutBtn.addEventListener("click", async () => {
   await auth.signOut();
   userMenu.classList.add("hidden");
