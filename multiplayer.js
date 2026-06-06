@@ -92,7 +92,6 @@ function showStep(step) {
   if (step === "password") stepPassword.classList.remove("hidden");
   if (step === "username") stepUsername.classList.remove("hidden");
 }
-
 // ===============================
 // EMAIL STEP
 // ===============================
@@ -110,27 +109,6 @@ emailNextBtn.addEventListener("click", async () => {
     await signInWithEmailAndPassword(auth, tempEmail, "___invalid___");
   } catch (err) {
     if (err.code === "auth/user-not-found") {
-      // New user → go to password step
-      isNewUser = true;
-      showStep("password");
-      return;
-    }
-
-    if (err.code === "auth/wrong-password") {
-      // Existing user → go to password step
-      isNewUser = false;
-      showStep("password");
-      return;
-    }
-  }
-});
-
-
-  // Check if email already has an account
-  try {
-    await signInWithEmailAndPassword(auth, tempEmail, "dummyPassword");
-  } catch (err) {
-    if (err.code === "auth/user-not-found") {
       isNewUser = true;
       showStep("password");
       return;
@@ -143,7 +121,6 @@ emailNextBtn.addEventListener("click", async () => {
     }
   }
 });
-
 
 // ===============================
 // PASSWORD STEP
