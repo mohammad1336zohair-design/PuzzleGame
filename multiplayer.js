@@ -42,7 +42,8 @@ import {
   doc,
   setDoc,
   getDoc,
-  updateDoc
+  updateDoc,
+  onSnapshot
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 // FIREBASE CONFIG
@@ -92,6 +93,7 @@ function showStep(step) {
   if (step === "password") stepPassword.classList.remove("hidden");
   if (step === "username") stepUsername.classList.remove("hidden");
 }
+
 // ===============================
 // EMAIL STEP
 // ===============================
@@ -105,7 +107,6 @@ emailNextBtn.addEventListener("click", async () => {
   }
 
   try {
-    // Try signing in with a fake password to detect if the user exists
     await signInWithEmailAndPassword(auth, tempEmail, "___invalid___");
   } catch (err) {
     if (err.code === "auth/user-not-found") {
@@ -135,7 +136,6 @@ passwordLoginBtn.addEventListener("click", async () => {
   }
 
   if (!isNewUser) {
-    // Existing user → log in
     try {
       await signInWithEmailAndPassword(auth, tempEmail, tempPassword);
       closeLogin();
@@ -143,7 +143,6 @@ passwordLoginBtn.addEventListener("click", async () => {
       alert("Incorrect password.");
     }
   } else {
-    // New user → go to username step
     showStep("username");
   }
 });
@@ -168,17 +167,18 @@ createAccountBtn.addEventListener("click", async () => {
     return;
   }
 
- const user = auth.currentUser || await new Promise(resolve => {
-  const unsub = onAuthStateChanged(auth, u => {
-    if (u) {
-      unsub();
-      resolve(u);
-    }
-  });
-});
+  const user =
+    auth.currentUser ||
+    (await new Promise((resolve) => {
+      const unsub = onAuthStateChanged(auth, (u) => {
+        if (u) {
+          unsub();
+          resolve(u);
+        }
+      });
+    }));
 
-const uid = user.uid;
-
+  const uid = user.uid;
 
   await setDoc(doc(db, "usernames", lower), {
     uid: uid,
@@ -193,6 +193,9 @@ const uid = user.uid;
   closeLogin();
 });
 
+// ===============================
+// LOGOUT
+// ===============================
 
 logoutBtn.addEventListener("click", async () => {
   await auth.signOut();
@@ -201,17 +204,16 @@ logoutBtn.addEventListener("click", async () => {
   window.showPractice();
 });
 
-
 // ===============================
 // GOOGLE LOGIN
 // ===============================
+
 googleLoginBtn.addEventListener("click", async () => {
   try {
     const result = await signInWithPopup(auth, googleProvider);
     const user = result.user;
 
-    // Wait for Firebase to finish updating auth state
-    await new Promise(resolve => setTimeout(resolve, 300));
+    await new Promise((resolve) => setTimeout(resolve, 300));
 
     const profileRef = doc(db, "users", user.uid);
     const profileSnap = await getDoc(profileRef);
@@ -226,8 +228,6 @@ googleLoginBtn.addEventListener("click", async () => {
     alert("Google login failed.");
   }
 });
-
-
 
 // ===============================
 // NEVERMIND BUTTON
@@ -265,7 +265,7 @@ onAuthStateChanged(auth, async (user) => {
 // REQUIRE LOGIN FOR MULTIPLAYER
 // ===============================
 
-async function ensureLoggedIn() {
+export async function ensureLoggedIn() {
   if (auth.currentUser) return true;
   openLogin();
   return false;
@@ -282,32 +282,24 @@ userIcon.addEventListener("click", () => {
   userMenu.classList.toggle("hidden");
 });
 
-// Close dropdown when clicking outside
 document.addEventListener("click", (e) => {
   if (!userIconContainer.contains(e.target)) {
     userMenu.classList.add("hidden");
   }
 });
 
-
 // ===============================
 // MULTIPLAYER ROOM SYSTEM
 // ===============================
 
-// DOM ELEMENTS
 const createRoomBtn = document.getElementById("createRoomBtn");
 const joinRoomBtn = document.getElementById("joinRoomBtn");
 const roomInput = document.getElementById("roomInput");
 const roomCodeText = document.getElementById("roomCodeText");
 const playerList = document.getElementById("playerList");
 
-// STATE
 let currentRoom = null;
 let roomUnsub = null;
-
-// ===============================
-// CREATE ROOM
-// ===============================
 
 createRoomBtn.addEventListener("click", async () => {
   const loggedIn = await ensureLoggedIn();
@@ -327,10 +319,6 @@ createRoomBtn.addEventListener("click", async () => {
 
   joinRoom(roomCode);
 });
-
-// ===============================
-// JOIN ROOM
-// ===============================
 
 joinRoomBtn.addEventListener("click", async () => {
   const loggedIn = await ensureLoggedIn();
@@ -353,10 +341,6 @@ joinRoomBtn.addEventListener("click", async () => {
   joinRoom(code);
 });
 
-// ===============================
-// JOIN ROOM LOGIC
-// ===============================
-
 async function joinRoom(code) {
   const user = auth.currentUser;
   const profile = await getDoc(doc(db, "users", user.uid));
@@ -364,7 +348,6 @@ async function joinRoom(code) {
 
   currentRoom = code;
 
-  // Add player to room
   await updateDoc(doc(db, "rooms", code), {
     [`players.${user.uid}`]: username
   });
@@ -373,10 +356,6 @@ async function joinRoom(code) {
 
   listenToRoom(code);
 }
-
-// ===============================
-// LISTEN TO ROOM
-// ===============================
 
 function listenToRoom(code) {
   if (roomUnsub) roomUnsub();
@@ -395,10 +374,6 @@ function listenToRoom(code) {
   });
 }
 
-// ===============================
-// UPDATE PLAYER LIST UI
-// ===============================
-
 function updatePlayerList(players) {
   playerList.innerHTML = "";
 
@@ -408,10 +383,6 @@ function updatePlayerList(players) {
     playerList.appendChild(li);
   });
 }
-
-// ===============================
-// LEAVE ROOM
-// ===============================
 
 async function leaveRoom() {
   if (!currentRoom) return;
@@ -429,7 +400,6 @@ async function leaveRoom() {
     delete players[user.uid];
 
     if (Object.keys(players).length === 0) {
-      // Delete empty room
       await setDoc(roomRef, {}, { merge: false });
     } else {
       await updateDoc(roomRef, { players });
@@ -444,6 +414,4 @@ async function leaveRoom() {
   playerList.innerHTML = "";
 }
 
-// Leave room when closing tab
 window.addEventListener("beforeunload", leaveRoom);
-
