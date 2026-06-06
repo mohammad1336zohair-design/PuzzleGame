@@ -1,3 +1,5 @@
+import { ensureLoggedIn } from "./multiplayer.js?v=11";
+
 // ===============================
 // PRACTICE MODE + NAVIGATION + CONFETTI
 // ===============================
@@ -38,7 +40,6 @@ function showPractice() {
 
   movesText.style.display = "block";
 
-  // Practice mode ALWAYS shows Guest
   const userNameCapsule = document.getElementById("userNameCapsule");
   userNameCapsule.textContent = "Guest";
 }
@@ -78,7 +79,7 @@ function initBoard() {
 function generateSolvableBoard() {
   let arr;
   do {
-    arr = [1,2,3,4,5,6,7,8,null];
+    arr = [1, 2, 3, 4, 5, 6, 7, 8, null];
     shuffle(arr);
   } while (!isSolvable(arr) || isSolved(arr));
   return arr;
@@ -99,7 +100,7 @@ function isSolved(arr) {
 }
 
 function isSolvable(arr) {
-  const nums = arr.filter(n => n !== null);
+  const nums = arr.filter((n) => n !== null);
   let inv = 0;
   for (let i = 0; i < nums.length; i++) {
     for (let j = i + 1; j < nums.length; j++) {
@@ -135,7 +136,7 @@ function updateTilePositions() {
   const size = window.innerWidth < 480 ? 95 : 130;
   const gap = 10;
 
-  document.querySelectorAll(".tile").forEach(tile => {
+  document.querySelectorAll(".tile").forEach((tile) => {
     const value = parseInt(tile.textContent);
     const index = tiles.indexOf(value);
     const row = Math.floor(index / 3);
@@ -161,8 +162,10 @@ function handleTileClick(index) {
 }
 
 function isAdjacent(a, b) {
-  const r1 = Math.floor(a / 3), c1 = a % 3;
-  const r2 = Math.floor(b / 3), c2 = b % 3;
+  const r1 = Math.floor(a / 3),
+    c1 = a % 3;
+  const r2 = Math.floor(b / 3),
+    c2 = b % 3;
   return Math.abs(r1 - r2) + Math.abs(c1 - c2) === 1;
 }
 
@@ -202,70 +205,6 @@ function createConfetti() {
 function drawConfetti() {
   confettiCtx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
 
-  confettiPieces.forEach(p => {
+  confettiPieces.forEach((p) => {
     confettiCtx.fillStyle = p.color;
-    confettiCtx.fillRect(p.x, p.y, p.size, p.size);
-    p.y += p.speedY;
-
-    if (p.y > confettiCanvas.height) {
-      p.y = -10;
-      p.x = Math.random() * confettiCanvas.width;
-    }
-  });
-
-  confettiAnimationId = requestAnimationFrame(drawConfetti);
-}
-
-function startConfetti() {
-  resizeConfettiCanvas();
-  createConfetti();
-  confettiCanvas.style.display = "block";
-  drawConfetti();
-}
-
-function stopConfetti() {
-  if (confettiAnimationId) cancelAnimationFrame(confettiAnimationId);
-  confettiCanvas.style.display = "none";
-  confettiCtx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
-}
-
-// ===============================
-// EVENTS
-// ===============================
-
-restartBtn.addEventListener("click", initBoard);
-
-closePopup.addEventListener("click", () => {
-  winPopup.classList.add("hidden");
-  stopConfetti();
-});
-
-practiceTab.addEventListener("click", showPractice);
-
-multiplayerTab.addEventListener("click", async () => {
-  // Make sure ensureLoggedIn exists
-  if (typeof ensureLoggedIn !== "function") {
-    console.error("ensureLoggedIn is missing");
-    window.showMultiplayer();
-    return;
-  }
-
-  const loggedIn = await ensureLoggedIn();
-  if (loggedIn) {
-    window.showMultiplayer();
-  }
-});
-
-
-
-window.addEventListener("resize", () => {
-  if (confettiCanvas.style.display === "block") resizeConfettiCanvas();
-  updateTilePositions();
-});
-
-// ===============================
-// INIT
-// ===============================
-
-initBoard();
-showPractice();
+    confettiCtx
