@@ -105,6 +105,27 @@ emailNextBtn.addEventListener("click", async () => {
     return;
   }
 
+  try {
+    // Try signing in with a fake password to detect if the user exists
+    await signInWithEmailAndPassword(auth, tempEmail, "___invalid___");
+  } catch (err) {
+    if (err.code === "auth/user-not-found") {
+      // New user → go to password step
+      isNewUser = true;
+      showStep("password");
+      return;
+    }
+
+    if (err.code === "auth/wrong-password") {
+      // Existing user → go to password step
+      isNewUser = false;
+      showStep("password");
+      return;
+    }
+  }
+});
+
+
   // Check if email already has an account
   try {
     await signInWithEmailAndPassword(auth, tempEmail, "dummyPassword");
@@ -164,12 +185,28 @@ createAccountBtn.addEventListener("click", async () => {
 
   const lower = tempUsername.toLowerCase();
 
-  // Check uniqueness
   const nameDoc = await getDoc(doc(db, "usernames", lower));
   if (nameDoc.exists()) {
     alert("Username already taken.");
     return;
   }
+
+  const user = auth.currentUser;
+  const uid = user.uid;
+
+  await setDoc(doc(db, "usernames", lower), {
+    uid: uid,
+    username: tempUsername
+  });
+
+  await setDoc(doc(db, "users", uid), {
+    email: user.email,
+    username: tempUsername
+  });
+
+  closeLogin();
+});
+
 
   try {
     // Create account
@@ -204,7 +241,6 @@ logoutBtn.addEventListener("click", async () => {
 // ===============================
 // GOOGLE LOGIN
 // ===============================
-
 googleLoginBtn.addEventListener("click", async () => {
   try {
     const result = await signInWithPopup(auth, googleProvider);
@@ -218,13 +254,14 @@ googleLoginBtn.addEventListener("click", async () => {
       isNewUser = true;
       showStep("username");
     } else {
-      // Existing Google user → close login
       closeLogin();
     }
   } catch (err) {
     alert("Google login failed.");
   }
 });
+
+
 
 
 // ===============================
